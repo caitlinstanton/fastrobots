@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ECE 4960 Fast Robots</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css/animate.css">
+	
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	
+	<link rel="stylesheet" href="css/flaticon.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="oi oi-menu"></span> Menu
+			</button>
+
+			<div class="collapse navbar-collapse" id="ftco-nav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+					<!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+					<!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- END nav -->
+
+	<section class="hero-wrap degree-right js-fullheight">
+		<div class="home-slider js-fullheight owl-carousel">
+			<div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+				<div class="overlay"></div>
+				<div class="container">
+					<div class="row no-gutters slider-text js-fullheight align-items-center">
+						<div class="col-md-12 ftco-animate">
+							<div class="text">
+								<h1 class="mb-4">Lab 2</h1>
+								<p>Bluetooth</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="ftco-section ftco-portfolio bg-light">
+		<div class="row justify-content-center no-gutters">
+			<div class="col-md-8 heading-section ftco-animate mb-5">
+				<h2 class="mb-2 text-center">Objective</h2>
+				<p>After starting basic work with the Nano last week, this lab introduced us to enabling Bluetooth connections on the Artemis. This not only involved establishing the connection but also testing its limits of data transmission.</p>
+				<h2 class="mb-2 text-center">Connect to the Artemis Board</h2>
+				<p>Much like in Lab #1, this lab was off to a rocky start. Uploading the code to the Artemis board wasn’t a problem, but connecting via Bluetooth proved to be more difficult. Originally I attempted to connect via the VM, making sure that both the Bluetooth adapter and the QinHeng adapter (for the CH430 driver on the Nano) were connected with Linux. Running hciconfig showed that the Bluetooth adapter was and lsusb showed that both devices were connected</p>
+				<img src="images/lab2/devices.png" style="display:block;margin: 0 auto;">
+				<p>Despite this, running python3 main.py failed to establish a connection, providing the following error consistently. This happened even after restarting the VM, reuploading code to the Nano, and using different combinations of USB ports on my laptop.</p>
+				<img src="images/lab2/progress.png" style="display:block;margin: 0 auto;">
+				<p>I made the choice to switch to my Mac, which ended up being successful. I had to make sure Bluetooth was enabled on my computer (or else Bleak would throw an error that the Bluetooth device was turned off).</p>
+				<img src="images/lab2/off.png" style="display:block;margin: 0 auto;">
+				<p>After running main.py over a few dozen times, it finally recognized a UUID of <code>0EEEB402-2AC5-4904-BAFA-925974A4CBA1</code>. I added this to settings.py, which made the connection slightly more reliable (meaning I would only have to run main.py once or twice to establish a connection).</p>
+				<img src="images/lab2/found.png" style="display:block;margin: 0 auto;">
+				<p>The onboard LED blinked slowly and <code>main.py</code> printed nothing to the terminal, further ensuring that the connection was made.</p>
+				<video controls="controls" src="videos/lab2/connected.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<br>
+				<h2 class="mb-2 text-center">Ping Your Robot</h2>
+				<p>Within <code>main.py</code>, I adjusted the function <code>myRobtTasks()</code> to send a ping to my robot board. All this entailed was commenting out pass and uncommenting <code>await theRobot.ping()</code>. Running main.py outputting a stream of pings to the terminal. To estimate the round-trip latency, I copied 80 of these pings and plotted them below:</p>
+				<img src="images/lab2/ping.png" style="display:block;margin: 0 auto;">
+				<p>Most pings (around 45) had a round-trip time ranging from 0.19 to 0.23 microseconds. The range was from 0.14 to 0.55 microseconds, with the mean equal to 0.221248046 microseconds.</p>
+				<br>
+				<h2 class="mb-2 text-center">Request a Float</h2>
+				<p>To send floats across the Bluetooth connection, I commented out <code>await theRobot.ping()</code> from the previous step and uncommented <code>await theRobot.sendCommand(Commands.REQ_FLOAT)</code>. From there, the <code>REQ_FLOAT</code> case in <code>ECE_4960_robot.ino</code> needed to be fleshed out:</p>
+				<code>
+					case REQ_FLOAT:<br>
+					            Serial.println("Going to send a float");<br>
+					            res_cmd->command_type = GIVE_FLOAT;    <br>
+					            res_cmd->length=6;     <br>                 
+					            ((float *)(res_cmd->data))[0] = 3.14f;  //put a float into data to send<br>
+					            amdtpsSendData((uint8_t *)res_cmd, 6); 
+				</code>
+				<p>Once this code was uploaded to the Nano, running <code>main.py</code> produced the following:</p>Once this code was uploaded to the Nano, running main.py produced the following:
+				<img src="images/lab2/float.png" style="display:block;margin: 0 auto;">
+				<p>It’s interesting to note that the float hardcoded was 3.14, whereas the float actually sent was 3.140000104904175. Though the difference is slight, it does illustrate that Bluetooth isn’t the most reliable data transmission.</p>
+				<br>
+				<h2 class="mb-2 text-center">Test the Data Rate</h2>
+				<p>So as to get more of a feel for the rate and reliability of wireless data transfer, I added to the code within the <code>if(bytestream_active)</code> condition to send 32-bit (4 byte) and 64-bit (8 byte) values. Within the .ino file I added the following code, which sent a 14-byte packet:</p>
+				<code>
+					if (bytestream_active) {<br>
+					  
+					      res_cmd->command_type = BYTESTREAM_TX; <br> 
+					      res_cmd->length = 14;<br>                   
+					      
+					      ((uint32_t *)(res_cmd->data))[0] = 32;  <br>
+					      
+					      uint64_t num = 64;<br>
+					      memcpy(res_cmd->data+4, &num, 8);   <br>    
+
+					      
+					      amdtpsSendData((uint8_t *)res_cmd, 14); <br> 
+					      
+					    
+					      unsigned long t = micros();<br>
+					      Serial.printf("Packet %d sent at %d micro seconds \n", packet_count, t);<br>
+					      packet_count++;<br>
+					    }
+
+				</code>
+				<p>Other additions to the .ino file included setting <code>bytestream_active</code> to 1 in the <code>START_BYTESTREAM_TX</code> case and initializing a global variable called <code>packet_count</code> to keep track of the number of packets. <code>await theRobot.sendCommand(Commands.START_BYTESTREAM_TX)</code> was added as a command to <code>myRobotTasks</code>, with all other commands commented out. For better printing in the terminal, within <code>simpleHandler()</code> in <code>main.py</code> I added (where "Iq" was used for the 4-byte case and "Iqqqqqqqq" for the 70-byte case):
+				</p>
+				<code>
+					if (code == Commands.BYTESTREAM_TX.value): <br>
+					                print(unpack("Iqqqqqqqq", data)) 
+
+				</code>
+				<p>The packet number and time (in microseconds) at which it was sent was printed within the serial monitor. The terminal, where main.py was running, printed the packet values as they were sent. When comparing the two datasets, only around 71.5% of the packets were actually sent, resulting in a drop rate of 38.5%.</p>
+				<img src="images/lab2/14b.png" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				<p>I also sent packets of 70 bytes, where the drop rate nearly doubled to 64.6%. The serial monitor and terminal looked relatively similar, except that each packet sent consisted of more values.</p>
+				<p>Histograms of both the 14-byte and 70-byte transmissions are below:</p>
+				<img src="images/lab2/14bdata.png" style="display:block;margin: 0 auto;">
+				<img src="images/lab2/70bdata.png" style="display:block;margin: 0 auto;">
+				<p>For the 14-byte transmissions, it took an average of 11176.60905 microseconds between packets, whereas for the 70-byte transmissions the average was 10908.43739 microseconds.</p>
+				<br>
+				<h2 class="mb-2 text-center">Conclusion</h2>
+				<p>Within the context of a smaller robot that we’ll be building, a Bluetooth connection is a lightweight data transmission system. However, there are pros and cons to consider with regards to its reliability and speed.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+	<footer class="ftco-footer ftco-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 text-center">
+					
+					<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+					</div>
+				</div>
+			</div>
+		</footer>
+		
+		
+
+		<!-- loader -->
+		<div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery-migrate-3.0.1.min.js"></script>
+		<script src="js/popper.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>
+		<script src="js/jquery.waypoints.min.js"></script>
+		<script src="js/jquery.stellar.min.js"></script>
+		<script src="js/owl.carousel.min.js"></script>
+		<script src="js/jquery.magnific-popup.min.js"></script>
+		<script src="js/jquery.animateNumber.min.js"></script>
+		<script src="js/scrollax.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+		<script src="js/google-map.js"></script>
+		<script src="js/main.js"></script>
+		
+	</body>
+	</html>
