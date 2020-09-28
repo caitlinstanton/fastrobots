@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ECE 4960 Fast Robots</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css/animate.css">
+	
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	
+	<link rel="stylesheet" href="css/flaticon.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="oi oi-menu"></span> Menu
+			</button>
+
+			<div class="collapse navbar-collapse" id="ftco-nav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+					<!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+					<!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- END nav -->
+
+	<section class="hero-wrap degree-right js-fullheight">
+		<div class="home-slider js-fullheight owl-carousel">
+			<div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+				<div class="overlay"></div>
+				<div class="container">
+					<div class="row no-gutters slider-text js-fullheight align-items-center">
+						<div class="col-md-12 ftco-animate">
+							<div class="text">
+								<h1 class="mb-4">Lab 3</h1>
+								<p>Characterizing Your Robot</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="ftco-section ftco-portfolio bg-light">
+		<div class="row justify-content-center no-gutters">
+			<div class="col-md-8 heading-section ftco-animate mb-5">
+				<h1 class="mb-2 text-center">Part A: Physical</h2>
+				<h2 class="mb-2 text-center">Objective</h2>
+				<p>Before we start taking the car apart, we needed to familiarize ourselves with the hardware being utilized. This was relatively open-ended and relied on us compiling datapoints to get a more robust view of the RC car. This lab was done in collaboration with Greg Kaiser.</p>
+				<h2 class="mb-2 text-center">Passive Measurements</h2>
+				<p>We started with passive measurements, namely mass and length. The recorded mass measurements can be found in the table below, divided into readings for the chassis, the battery, and additional electronics.</p>
+				<img src="images/lab3/mass.png" style="display:block;margin: 0 auto;">
+				<p>There were many components of the car to measure the length of, all of which are recorded in the table below. This includes the lengths, heights, and widths of the chassis, batteries, and wheels. Note, the measurements in green were the average of 5 measurements.</p>
+				<img src="images/lab3/length.png" style="display:block;margin: 0 auto;">
+				<br>
+				<h2 class="mb-2 text-center">Active Measurements</h2>
+				<p>The first focus of our active measurements was the rotational speed of the wheels. With the controller having settings for “speedy” and “slow” movement, we wanted to characterize what that actually meant in terms of speed. We also weren’t sure as to whether these buttons needed to be held during the motion in question, or could be clicked briefly before moving the joysticks. </p>
+				<img src="images/lab3/acceleration.png" style="display:block;margin: 0 auto;">
+				<p>This experiment was conducted by taping a point on each of the wheels, filming the rotation for each pair, and going frame by frame in the footage to see how long it took for each wheel to complete a rotation. The conclusion of our findings was that the rotational speed of the wheels doesn’t vary by much, but isn’t even across the two pairs of wheels (though each wheel in a pair does have almost identical movement).</p>
+				<video controls="controls" src="videos/lab3/acceleration_vid.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<p>Next was stress-testing the bluetooth connection between the robot and the controller. The procedure for testing this was turning the robot on, then placing a certain amount of distance between the controller and the robot (with and without an obstacle directly in the way) before clicking the button to turn the controller on. The controller was filmed to see the time difference between the button press and the first frame that the LED turned a solid red, implying connection with the robot.</p>
+				<img src="images/lab3/bt.png" style="display:block;margin: 0 auto;">
+				<p>The findings are in the table below. A larger sample size of distances would lead to more conclusive results, but it’s clear that the existence of an obstacle (in this case, a door) impacted the time to connect slightly. The hypothesis for distance was that the time to connect would increase with distance, but this wasn’t the case; instead, it reinforced the unpredictability of bluetooth connection.</p>
+				<video controls="controls" src="videos/lab3/bt_vid.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<p>Data regarding the consequences of tight spins by the robot is shown in the table below. The drift of the wheels while spinning clockwise had a percent difference of 41.6% versus counterclockwise.</p>
+				<img src="images/lab3/spinning.png" style="display:block;margin: 0 auto;">
+				<br>
+				<h2 class="mb-2 text-center">Overall Robot Motion</h2>
+				<p>The car itself is very nimble, able to make tight turns relatively quickly. Some tricks we were able to exhibit were somersaults, spinning in place, and moving only on two wheels. Somersaulting was achieved by going abruptly from max speed in one direction to max speed in the opposite direction. The robot was able to spin in place by holding the joysticks individually in opposite directions. Moving while only on a pair of wheels wasn’t a trick that could be done by controls alone, but required the robot to ram into an object with enough force to propel it onto its side, after which the wheels were large enough to still be able to move. These movements were less precise, as would be expected, and resulted in large turning radii, even when moving straight.</p>
+				<video controls="controls" src="videos/lab3/tricks.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<br>
+				<h1 class="mb-2 text-center">Part B: Virtual</h2>
+				<h2 class="mb-2 text-center">Objective</h2>
+				<p>Not only will we be working with a physical robot, but with a virtual counterpart. This lab involved taking a look at the simulation and the tools used to interact with it.</p>
+				<br>
+				<h2 class="mb-2 text-center">Understanding the Virtual Environment</h2>
+				<p>For once my VM decided to respond as expected to downloading and running software tools! Installing the software dependencies and running the setup bash script went very smoothly, as shown by the screenshots below.</p>
+				<img src="images/lab3/lab_manager.PNG" style="width:500px;height:300px;display:block;margin: 0 auto;">
+				<img src="images/lab3/successful_setup.PNG" style="width:500px;height:300px;display:block;margin: 0 auto;">
+				<br>
+				<h2 class="mb-2 text-center">Characterizing the Virtual Environment</h2>
+				<p>Below is a video showing interactions between the simulation (right) and the keyboard teleoperation tool (left). The initial values for the linear and angular speeds of the robot were printed to the terminal, equal to 0.1 and 0.3 respectively. Something to note is that the virtual robot is a little slow to respond, exacerbated by the fact that the robot isn’t a tangible object whose movements can be recorded in real life.</p>
+				<video controls="controls" src="videos/lab3/virtual.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<p>In the video, I pressed the w key to increase the linear speed by 10% and the c key to decrease the angular speed by 10%. After adjusting the speeds, I started to explore the environment using the motion keys. I was able to “kidnap” the robot when stationary (as shown in the screenshot) and while in motion. Once the robot had been “kidnapped” (clicked and dragged by the mouse), pressing o showed frames of previous states of motion. If the robot knocked into an obstacle during any point of this motion, it disappeared and was replaced by an immovable warning symbol.</p>
+				<br>
+				<h1 class="mb-2 text-center">Conclusion</h1>
+				<p>The tangible robot is an exciting prospect to work with, since there are a lot of potential possibilities with regards to its motion and instability. The virtual robot is an interesting place to try out theories before working them into fruition on the car. Putting these datapoints, along with those of the class, together will help in the future when weighing the pros and cons of design decisions.</p>
+				<video controls="controls" src="videos/lab3/goodbye.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+			</div>
+		</div>
+	</section>
+
+	<!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+	<footer class="ftco-footer ftco-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 text-center">
+					
+					<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+					</div>
+				</div>
+			</div>
+		</footer>
+		
+		
+
+		<!-- loader -->
+		<div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery-migrate-3.0.1.min.js"></script>
+		<script src="js/popper.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>
+		<script src="js/jquery.waypoints.min.js"></script>
+		<script src="js/jquery.stellar.min.js"></script>
+		<script src="js/owl.carousel.min.js"></script>
+		<script src="js/jquery.magnific-popup.min.js"></script>
+		<script src="js/jquery.animateNumber.min.js"></script>
+		<script src="js/scrollax.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+		<script src="js/google-map.js"></script>
+		<script src="js/main.js"></script>
+		
+	</body>
+	</html>
