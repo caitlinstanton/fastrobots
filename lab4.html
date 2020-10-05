@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ECE 4960 Fast Robots</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css/animate.css">
+	
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	
+	<link rel="stylesheet" href="css/flaticon.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="oi oi-menu"></span> Menu
+			</button>
+
+			<div class="collapse navbar-collapse" id="ftco-nav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+					<!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+					<!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- END nav -->
+
+	<section class="hero-wrap degree-right js-fullheight">
+		<div class="home-slider js-fullheight owl-carousel">
+			<div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+				<div class="overlay"></div>
+				<div class="container">
+					<div class="row no-gutters slider-text js-fullheight align-items-center">
+						<div class="col-md-12 ftco-animate">
+							<div class="text">
+								<h1 class="mb-4">Lab 4</h1>
+								<p>Open Loop Control</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="ftco-section ftco-portfolio bg-light">
+		<div class="row justify-content-center no-gutters">
+			<div class="col-md-8 heading-section ftco-animate mb-5">
+				<h1 class="mb-2 text-center">Part A: Physical</h2>
+				<h2 class="mb-2 text-center">Objective</h2>
+				<p>Our first experiences with the car relied on manual control via a connected controller and relatively jumpy and untuned motor drives. This lab involved changing the control of the car from manual to open loop by replacing the motor drivers with programmable ones.</p>
+				<h2 class="mb-2 text-center">Robot Deconstruction</h2>
+				<img src="images/lab4/original.png" style="display:block;margin: 0 auto;">
+				<p>The original RC car was outfitted with a round green chassis, which was the first part to go when configuring the car. The control PCB was removed and its connections to the motors severed in order to replace it with the Sparkfun Qwiic motor driver. The only hairy moment happened when the threaded wires for the motors kept falling out of the screw terminals on the motor driver, but a little twisting and wire cutting did the trick.</p>
+				<p>This is what Klaus the robot looked like after the plates securing the battery and Artemis/additional electronics were screwed in place.</p>
+				<img src="images/lab4/improved.jpg" style="width:500px;height:400px;display:block;margin: 0 auto;">
+				<br>
+				<h2 class="mb-2 text-center">Serial Controlled Motor Drivers</h2>
+				<p>According to its <a href="https://learn.sparkfun.com/tutorials/hookup-guide-for-the-qwiic-motor-driver">product sheet</a>, the Qwiic Motor Driver is essentially a mini version of the Serial Controlled Motor Driver with added Qwiic ports. It can be controlled using I2C commands, so therefore the I2C address of the motor driver needed to be found. This was done by running the following code across all 127 available addresses:</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">Wire.beginTransmission(address);
+				error <span style="color: #333333">=</span> Wire.endTransmission();
+
+				<span style="color: #008800; font-weight: bold">if</span> (error <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">0</span>) {
+				   Serial.print(<span style="background-color: #fff0f0">&quot;I2C device found at address 0x&quot;</span>);
+				   <span style="color: #008800; font-weight: bold">if</span> (address <span style="color: #333333">&lt;</span> <span style="color: #0000DD; font-weight: bold">16</span>)
+				      Serial.print(<span style="background-color: #fff0f0">&quot;0&quot;</span>);
+				   Serial.print(address, HEX);
+				   Serial.println(<span style="background-color: #fff0f0">&quot;  !&quot;</span>);
+
+				   nDevices<span style="color: #333333">++</span>;
+				} <span style="color: #008800; font-weight: bold">else</span> <span style="color: #008800; font-weight: bold">if</span> (error <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">4</span>) {
+				   Serial.print(<span style="background-color: #fff0f0">&quot;Unknown error at address 0x&quot;</span>);
+				   <span style="color: #008800; font-weight: bold">if</span> (address <span style="color: #333333">&lt;</span> <span style="color: #0000DD; font-weight: bold">16</span>)
+				      Serial.print(<span style="background-color: #fff0f0">&quot;0&quot;</span>);
+				   Serial.println(address, HEX);
+				}
+				</pre></div>
+
+				<p>This resulted in the following output to the serial monitor, indicating I2C devices connected at addresses 0x5D and 0x69.</p>
+				<img src="images/lab4/i2c_connection.png" style="width:500px;height:400px;display:block;margin: 0 auto;">
+				<p>Digging a little into the expectations of I2C for the SCMD, I found  table listing out the addresses for various protocols on the driver <a href="https://learn.sparkfun.com/tutorials/serial-controlled-motor-driver-hookup-guide/all">here</a>:</p>
+				<img src="images/lab4/port_addresses.png" style="display:block;margin: 0 auto;">
+				<p>The overlap in printed addresses and expected addresses was at 0x5D, so I used that address within the MotorTest example code, taking care to also ensure only I2C communication was enabled.</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">myMotorDriver.settings.commInterface <span style="color: #333333">=</span> I2C_MODE;
+				myMotorDriver.settings.I2CAddress <span style="color: #333333">=</span> <span style="color: #005588; font-weight: bold">0x5D</span>; <span style="color: #888888">//config pattern &quot;0101&quot; on board for address 0x5D</span>
+				</pre></div>
+				<p>The function myMotorDriver.setDrive( ) is solely responsible for the direction and speed of the motors. It takes in an integer from 0 to 34 representing the motor, either 0 for backwards motion or 1 for forward motion, and an integer from 0 to 255 to set the speed at which the motor would spin. The example code stepped through all 34 motors and set them to full forward and backward motion; observing its results showed that the car’s two motors are numbered 0 and 1.</p>
+				<video controls="controls" src="videos/lab4/motor_control.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<p>To find the lower limit at which the motor still turns I used a binary search approach, calling myMotorDriver.setDrive( ) with a speed of 255, then 127, then 63, etc. As I approached the lower limits for both motors, it became apparent that both the motors and the direction of motion had different lower limits. I also noted that the lower limits sometimes shifted. For example, at one point the right motor’s backwards motion levelled off at 38, but a few setDrive() commands later the limit was at 40. If the motors were set to different drive magnitudes, but each at the lower limit of their respective direction, the wheel would only turn in one direction. With this in mind, I determined the lower limit to be the number at which the motors turned reliably and consistently.</p>
+				<img src="images/lab4/lower_limit.png" style="display:block;margin: 0 auto;">
+				<br>
+				<h2 class="mb-2 text-center">Klaus, the Chaotic Good Robot</h2>
+				<p>Previous to this lab, all of the robot’s motion was controlled manually. There was noticeable lag and the robot was quite jittery, so it was necessary to establish more deterministic motion. The first step to this is open loop control, hardcoding signals to send to the motor drivers to produce predictable results.</p>
+				<p>I started with calibrating the motors in order to follow a straight line. The lower limit for the left wheels is greater than that of the right, leading me to assume that the left motor requires more power to achieve a similar level of performance. With this in mind, a little trial and error, I was able to find a balance between the two motors. Moving backward was simple, only needing to invert the direction of the motors from forward().</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">forward</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">100</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">125</span>); <span style="color: #888888">//drive left motor</span>
+				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">backward</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">100</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">125</span>); <span style="color: #888888">//drive left motor</span>
+				}
+				</pre></div>
+
+				<video controls="controls" src="videos/lab4/straight_line.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<p>To make a loop, I implemented a turnRight function and added it along with a call to forward() in loop(). The calls to delay() held the robot in that motor control command, such that a delay of 500ms would cause the robot to continue the most recently programmed motion for 500ms.</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">turnRight</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive left motor</span>
+				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>()
+				{
+				  forward();
+				  delay(<span style="color: #0000DD; font-weight: bold">500</span>);
+				  turnRight();
+				  delay(<span style="color: #0000DD; font-weight: bold">300</span>);
+				}
+				</pre></div>
+				<video controls="controls" src="videos/lab4/physical_open_loop.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<br>
+				<h1 class="mb-2 text-center">Part B: Virtual</h2>
+				<h2 class="mb-2 text-center">Objective</h2>
+				<p>Last lab we explored a bit of the simulator in order to better understand the control mechanics of the virtual environment. Much like the control of the physical car, the virtual car was controlled manually, so this lab explored open loop control to take the next step towards making the car autonomous.</p>
+				<br>
+				<h2 class="mb-2 text-center">Looping with Jupyter Notebook</h2>
+				<p>Lab 3 allowed me to become familiar with the simulator, which had to be opened before the Jupyter notebook. The latter was responsible for sending commands to the virtual robot, similar to the Qwiic motor driver.</p>
+				<p>An instance of the class Robot was created and initialized before having its linear and angular velocity set using set_vel(). Positive values for linear velocity moved the car forward, while negative values moved it backward. Similarly, positive values for angular velocity made the car turn counter-clockwise and negative values made it turn clockwise. To make a looping motion, I called set_vel() within a while True to move the robot forward then turn to the right forever. The sleep statements were used to hold the robot in that motion (moving forward or turning right) for some time, so that the loop was wider than a single point of rotation.</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">while</span> True<span style="color: #333333">:</span>
+				    robot.set_vel(<span style="color: #6600EE; font-weight: bold">0.5</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
+				    time.sleep(<span style="color: #0000DD; font-weight: bold">5</span>)
+				    robot.set_vel(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #333333">-</span><span style="color: #0000DD; font-weight: bold">50</span>) 
+				    time.sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+				</pre></div>
+
+				<video controls="controls" src="videos/lab4/virtual_loop.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<br>
+				<h1 class="mb-2 text-center">Conclusion</h1>
+				<p>This lab was the implementation of knowledge about the physical and virtual robots acquired through lab 3. It made the pros and cons of Klaus more visible, for example how it can respond to motor driver commands relatively instantaneously but can be pushed off track by as much of an obstacle as a small piece of lettuce on my kitchen floor. It makes me feel excited for the possibilities of development throughout the rest of the semester!</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+	<footer class="ftco-footer ftco-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 text-center">
+					
+					<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+					</div>
+				</div>
+			</div>
+		</footer>
+		
+		
+
+		<!-- loader -->
+		<div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery-migrate-3.0.1.min.js"></script>
+		<script src="js/popper.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>
+		<script src="js/jquery.waypoints.min.js"></script>
+		<script src="js/jquery.stellar.min.js"></script>
+		<script src="js/owl.carousel.min.js"></script>
+		<script src="js/jquery.magnific-popup.min.js"></script>
+		<script src="js/jquery.animateNumber.min.js"></script>
+		<script src="js/scrollax.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+		<script src="js/google-map.js"></script>
+		<script src="js/main.js"></script>
+		
+	</body>
+	</html>
