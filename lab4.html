@@ -69,7 +69,7 @@
 				<img src="images/lab4/original.png" style="display:block;margin: 0 auto;">
 				<p>The original RC car was outfitted with a round green chassis, which was the first part to go when configuring the car. The control PCB was removed and its connections to the motors severed in order to replace it with the Sparkfun Qwiic motor driver. The only hairy moment happened when the threaded wires for the motors kept falling out of the screw terminals on the motor driver, but a little twisting and wire cutting did the trick.</p>
 				<p>This is what Klaus the robot looked like after the plates securing the battery and Artemis/additional electronics were screwed in place.</p>
-				<img src="images/lab4/improved.jpg" style="width:500px;height:400px;display:block;margin: 0 auto;">
+				<img src="images/lab4/improved.JPG" style="width:500px;height:400px;display:block;margin: 0 auto;">
 				<br>
 				<h2 class="mb-2 text-center">Serial Controlled Motor Drivers</h2>
 				<p>According to its <a href="https://learn.sparkfun.com/tutorials/hookup-guide-for-the-qwiic-motor-driver">product sheet</a>, the Qwiic Motor Driver is essentially a mini version of the Serial Controlled Motor Driver with added Qwiic ports. It can be controlled using I2C commands, so therefore the I2C address of the motor driver needed to be found. This was done by running the following code across all 127 available addresses:</p>
@@ -156,9 +156,7 @@
 				    time.sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
 				</pre></div>
 
-				<video controls="controls" src="videos/lab4/virtual_loop.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
-				    Your browser does not support the HTML5 Video element.
-				</video>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/Ay1KR_iK1nI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<br>
 				<h1 class="mb-2 text-center">Conclusion</h1>
 				<p>This lab was the implementation of knowledge about the physical and virtual robots acquired through lab 3. It made the pros and cons of Klaus more visible, for example how it can respond to motor driver commands relatively instantaneously but can be pushed off track by as much of an obstacle as a small piece of lettuce on my kitchen floor. It makes me feel excited for the possibilities of development throughout the rest of the semester!</p>
