@@ -238,7 +238,7 @@
 				    Your browser does not support the HTML5 Video element.
 				</video>
 				<br>
-				
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/l8HD4LeNz1Q" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>(<span style="color: #333399; font-weight: bold">void</span>)
 				{
 				  <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #333333">!</span>distanceSensor.checkForDataReady())
@@ -348,9 +348,11 @@
 				           
 				perform_obstacle_avoidance(robot)
 				</pre></div>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/M7t_hfpyY7U" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<p>All sleep commands after set_vel() were set to 1 second, allowing for crisp 90 degree turns and straight forward movement. There was the option to have smaller turns if the robot detected an obstacle, which would lead to less deterministic and slower movement. I wanted to be able to easily debug the robot’s movements, hence 90 degree turns at obstacles.</p>
 				<p>A linear velocity of 1 with a time.sleep(1) was easy to predict. It also allowed for the robot to sometimes slide along the walls, rather than collide with them, since this set_vel() command spanned around the length of a grid square.</p>
 				<p>Something to note, as seen in the video below, is that although the code is valid in its logic, there is drift. This drift does eventually lead to collisions. A potential fix is to use while loops instead of time.sleep to determine how long to turn for. This will lead to more granular degrees of rotation, rather than exact 90 degree turns.</p>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/V2RK3F-79XQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<br>
 				<h1 class="mb-2 text-center">Conclusion</h1>
 				<p>Making a physical or virtual object autonomous is easier said than done. Reliance on sensors for data to respond to will make your code vulnerable to noise and errors. Calibration and robust logic can prevent some of these potential failures, but the world will always throw a curveball at you, whether it’s in the configuration of the robot or its external environment.</p>
