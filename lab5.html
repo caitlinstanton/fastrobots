@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ECE 4960 Fast Robots</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css/animate.css">
+	
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	
+	<link rel="stylesheet" href="css/flaticon.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="oi oi-menu"></span> Menu
+			</button>
+
+			<div class="collapse navbar-collapse" id="ftco-nav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+					<!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+					<!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- END nav -->
+
+	<section class="hero-wrap degree-right js-fullheight">
+		<div class="home-slider js-fullheight owl-carousel">
+			<div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+				<div class="overlay"></div>
+				<div class="container">
+					<div class="row no-gutters slider-text js-fullheight align-items-center">
+						<div class="col-md-12 ftco-animate">
+							<div class="text">
+								<h1 class="mb-4">Lab 5</h1>
+								<p>Obstacle Avoidance</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="ftco-section ftco-portfolio bg-light">
+		<div class="row justify-content-center no-gutters">
+			<div class="col-md-8 heading-section ftco-animate mb-5">
+				<h1 class="mb-2 text-center">Part A: Physical</h2>
+				<h2 class="mb-2 text-center">Objective</h2>
+				<p>Last lab we implemented open loop control, and this lab was meant to build from that motion to perform obstacle performance. This was done through distance sensors, specifically a proximity sensor and time-of-flight sensor.</p>
+				<h2 class="mb-2 text-center">Proximity Sensor</h2>
+				<p>The first sensor to look at was the VCNL4040 proximity sensor. It specifically comprises features that make it equivalent to the combination of a proximity sensor (PS), ambient light sensor (ALS), and a high power IRED. It’s primarily meant to detect if an object has passed in front of the sensor, rather than output the specific distance to the aforementioned object. </p>
+				<p>The sensor is controlled by I2C communication, specifically over address 0x60. This was noted both on the <a href="https://learn.sparkfun.com/tutorials/qwiic-proximity-sensor-vcnl4040-hookup-guide">Sparkfun product page</a> and after running the Arduino Wire sketch to locate any I2C connections.</p>
+				<img src="images/lab5/proximity_addr.png" style="width:500px;height:400px;display:block;margin: 0 auto;">
+				<p>To better understand the sensitivity of the sensor, I ran multiple trials passing objects in front of it and varying their color and distance. I did this with the array of objects seen below (a paper that’s white on one side and gray on the other; a black planter; a brown planter; purple translucent Tupperware; and a glass jar). I placed each on the coordinate grid at (0,6), (0,0), and (0,-6) and ran the Example4_AllReadings file with direct ambient light and with no direct ambient light (aka my living room light being on vs off). The measurements for no object with the light on was 15 and with the light off was 17.</p>
+				<img src="images/lab5/prox_light.png" style="display:block;margin: 0 auto;">
+				<img src="images/lab5/prox_nolight.png" style="display:block;margin: 0 auto;">
+				<p>In order to calculate the frequency of measurements and the length of time to read them, I added the following code to the loop function:</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">long</span> start <span style="color: #333333">=</span> micros();
+				<span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">int</span> proxValue <span style="color: #333333">=</span> proximitySensor.getProximity();
+				<span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">long</span> length <span style="color: #333333">=</span> micros() <span style="color: #333333">-</span> start;
+				Serial.println(length);
+				</pre></div>
+				<p>After gathering a sample size of around 200 readings, the average length of time to read the sensor’s value was determined to be 630 μs with a standard deviation of 0.167.</p>
+				<br>
+				<h2 class="mb-2 text-center">Time of Flight Sensor</h2>
+				<p>Similar to the proximity sensor, the VL53L1X ToF sensor uses I2C. Its address was 0x29, which isn’t what the datasheet indicated. However, there isn’t necessarily an error with this because the address is programmable and therefore can be changed.</p>
+				<img src="images/lab5/tof_addr.png" style="width:500px;height:400px;display:block;margin: 0 auto;">
+				<p>I ran the same series of experiments as with the proximity sensor to gauge the range of readings, except with the ToF sensor I didn’t vary the amount of ambient light. This was due to the fact that the ToF sensor doesn’t have any circuitry related to measuring the amount of light, so ambient light shouldn’t have an effect on the measurements.</p>
+				<p>Below are two graphs for comparison: the first is pre-calibration and the other post. I determined the sensor needed to be calibrated because the outputs of the sensor are meant to be an accurate representation of the distance to the object, but they were drastically different than what the coordinate grid indicated. For instance, the uncalibrated sensor gave an average reading of 505mm when no object was in front of it, while the calibrated sensor gave an average of 857mm; the latter is more accurate since a couch was in the sensor’s path maybe two feet away.</p>
+				<img src="images/lab5/uncalibrated_tof.png" style="display:block;margin: 0 auto;">
+				<img src="images/lab5/calibrated_tof.png" style="display:block;margin: 0 auto;">
+				<p>Something to note with the calibration code is that the example Arduino file (Example7_Calibration) didn’t work in its original form. It required a call to distanceSensor.startRanging(); before any data could be collected to trigger the calibration sequence.</p>
+				<img src="images/lab5/calibration_code.png" style="width:500px;height:400px;display:block;margin: 0 auto;">
+				<p>Once that bug was sorted out, the range of calibration was 41mm; in any future programs that require readings from the ToF sensor, I had to make sure to call distanceSensor.setOffset(41); before any data was gathered.</p>
+				<img src="images/lab5/calibration_code_result.png" style="width:500px;height:400px;display:block;margin: 0 auto;">
+				<p>The average maximum speed of the car is 2.68 meters per second, as determined from the class’s collective dataset. This means that every 10cm can be travelled in around 37ms. 10cm seems like a solid buffer for object avoidance, so I adjusted the timing budget and inter measurement period values to 35 and 5 respectively with the setup() function (adding even a little bit more buffer).</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">distanceSensor.setTimingBudgetInMs(<span style="color: #0000DD; font-weight: bold">35</span>);
+				distanceSensor.setIntermeasurementPeriod(<span style="color: #0000DD; font-weight: bold">5</span>);
+				</pre></div>
+				<p>The ToF sensor has three distance modes—short, 1.3m; medium, 3m; and long, 4m—so to choose which one to proceed with, I calculated the length of time it would take to cover those distances. With the average maximum speed of 2.68 m/s in mind, it would take 0.485s, 1.12s, and 1.49s, respectively. Given that the timing budget and inter measurement period summed up to 40ms, 500ms was more than enough of a window for reaction so I called distanceSensor.setDistanceModeShort(); within setup() to optimize the ranging performance given the maximum expected range.</p>
+				<p>Next came stress testing in the form of understanding how a moving object will affect the sensor’s readings. I chose three modes of movement: side to side, up and down, and forward and back. Moving my hand side to side resulted in “Range Status: Wrapped target fail” errors 19% of the time and “Range Status: Signal fail” almost 2% of the time. The up and down motion resulted in a “Wrapped target fail” error rate of 17% and “Signal fair” error rate of 1%. When moving my hand forward and backward, the error “Range Status: Wrapped target fail” appeared almost 2% of the time. Though the error ranges were relatively small, the fact that they existed at all when handling moving objects is a critical trend to keep in mind, especially as we control a moving object itself. If the environment is full of moving objects and the robot is going fast, measurements will fail more often and the code must be more robust to accommodate this.</p>
+				<p>The ranging time was 48.5ms on average with a standard deviation of 1.73. I found this value using the code below:</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">setup</span>(<span style="color: #333399; font-weight: bold">void</span>)
+				{
+				  Wire.begin();
+
+				  Serial.begin(<span style="color: #0000DD; font-weight: bold">115200</span>);
+				  Serial.println(<span style="background-color: #fff0f0">&quot;VL53L1X Qwiic Test&quot;</span>);
+				  <span style="color: #888888">//VL53L1_SetInterMeasurementPeriodMilliSeconds(&amp;VL53L1Dev, 1000 );</span>
+				  <span style="color: #008800; font-weight: bold">if</span> (distanceSensor.begin() <span style="color: #333333">!=</span> <span style="color: #0000DD; font-weight: bold">0</span>) <span style="color: #888888">//Begin returns 0 on a good init</span>
+				  {
+				    Serial.println(<span style="background-color: #fff0f0">&quot;Sensor failed to begin. Please check wiring. Freezing...&quot;</span>);
+				    <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #0000DD; font-weight: bold">1</span>)
+				      ;
+				  }
+				  Serial.println(<span style="background-color: #fff0f0">&quot;Sensor online!&quot;</span>);
+				  distanceSensor.setTimingBudgetInMs(<span style="color: #0000DD; font-weight: bold">35</span>);
+				  distanceSensor.setIntermeasurementPeriod(<span style="color: #0000DD; font-weight: bold">5</span>);
+				  distanceSensor.setDistanceModeShort();
+				  distanceSensor.startRanging(); 
+				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>(<span style="color: #333399; font-weight: bold">void</span>)
+				{
+				  <span style="color: #333399; font-weight: bold">long</span> startTime <span style="color: #333333">=</span> millis();
+				  <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #333333">!</span>distanceSensor.checkForDataReady())
+				  {
+				    delay(<span style="color: #0000DD; font-weight: bold">1</span>);
+				  }
+				  <span style="color: #333399; font-weight: bold">int</span> distance <span style="color: #333333">=</span> distanceSensor.getDistance();   distanceSensor.clearInterrupt();
+				  <span style="color: #333399; font-weight: bold">long</span> endTime <span style="color: #333333">=</span> millis();
+				  Serial.print(<span style="background-color: #fff0f0">&quot;Distance(mm): &quot;</span>);
+				  Serial.print(distance);
+
+				  <span style="color: #333399; font-weight: bold">float</span> distanceInches <span style="color: #333333">=</span> distance <span style="color: #333333">*</span> <span style="color: #6600EE; font-weight: bold">0.0393701</span>;
+				  <span style="color: #333399; font-weight: bold">float</span> distanceFeet <span style="color: #333333">=</span> distanceInches <span style="color: #333333">/</span> <span style="color: #6600EE; font-weight: bold">12.0</span>;
+
+				  Serial.print(<span style="background-color: #fff0f0">&quot;</span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\t</span><span style="background-color: #fff0f0">Distance(ft): &quot;</span>);
+				  Serial.print(distanceFeet, <span style="color: #0000DD; font-weight: bold">2</span>);
+				  Serial.print(<span style="background-color: #fff0f0">&quot;</span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\t</span><span style="background-color: #fff0f0">Ranger time: ,&quot;</span>);
+				  Serial.print((<span style="color: #333399; font-weight: bold">float</span>)(endTime <span style="color: #333333">-</span> startTime), <span style="color: #0000DD; font-weight: bold">2</span>);
+
+				  Serial.println();
+				}
+				</pre></div>
+				<p>Distance readings in ambient light for the same five objects as in the previous trials can be found below:</p>
+				<img src="images/lab5/ranging_tof.png" style="display:block;margin: 0 auto;">
+				<br>
+				<h2 class="mb-2 text-center">Obstacle Avoidance</h2>
+				<p>With the addition of two new sensors, Klaus had to be reorganized a bit. I routed another Qwiic connected from the motor driver stored within the chassis to outside, and daisy chained the IMU, proximity sensor, and ToF sensors with the Artemis Nano. To allow the robot to “see” where it’s going, I fixed the proximity and ToF sensors to the front of the robot using strips of cardboard.</p>
+				<img src="images/lab5/klaus_side_view.JPG" style="width:400px;height:500px;display:block;margin: 0 auto;">
+				<img src="images/lab5/klaus_top_view.JPG" style="width:400px;height:500px;display:block;margin: 0 auto;">
+				<p>After running some iterations of the obstacle avoidance code, I realized that the robot would perform correctly when suspended on a cup (i.e. stopping its wheels when my hand passed in front of the sensors) but not when moving on the ground. Adjusting the sensors with a zip tie to be angled more upwards fixed this, as the sensors were sensing the floor below them and therefore not even starting the wheels.</p>
+				<p>I built off my existing motion functions from previously labs to include brakeForwards(), brakeBackwards(), and stopWheels().</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #557799">#include &lt;Arduino.h&gt;</span>
+				<span style="color: #557799">#include &lt;stdint.h&gt;</span>
+				<span style="color: #557799">#include &quot;SCMD.h&quot;</span>
+				<span style="color: #557799">#include &quot;SCMD_config.h&quot; </span><span style="color: #888888">//Contains #defines for common SCMD register names and values</span>
+				<span style="color: #557799">#include &lt;ComponentObject.h&gt;</span>
+				<span style="color: #557799">#include &lt;RangeSensor.h&gt;</span>
+				<span style="color: #557799">#include &lt;SparkFun_VL53L1X.h&gt;</span>
+				<span style="color: #557799">#include &lt;vl53l1x_class.h&gt;</span>
+				<span style="color: #557799">#include &lt;vl53l1_error_codes.h&gt;</span>
+				<span style="color: #557799">#include &lt;Wire.h&gt;</span>
+				<span style="color: #557799">#include &quot;SparkFun_VL53L1X.h&quot; </span>
+				<span style="color: #557799">#include &quot;SparkFun_VCNL4040_Arduino_Library.h&quot;</span>
+				VCNL4040 proximitySensor;
+
+				<span style="color: #888888">//Optional interrupt and shutdown pins.</span>
+				<span style="color: #557799">#define SHUTDOWN_PIN 2</span>
+				<span style="color: #557799">#define INTERRUPT_PIN 3</span>
+
+				SCMD myMotorDriver; <span style="color: #888888">//This creates the main object of one motor driver and connected slaves.</span>
+
+				SFEVL53L1X distanceSensor;
+				<span style="color: #888888">//Uncomment the following line to use the optional shutdown and interrupt pins.</span>
+				<span style="color: #888888">//SFEVL53L1X distanceSensor(Wire, SHUTDOWN_PIN, INTERRUPT_PIN);</span>
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">setup</span>(<span style="color: #333399; font-weight: bold">void</span>)
+				{
+				  Serial.begin(<span style="color: #0000DD; font-weight: bold">115200</span>);
+				  
+				  <span style="color: #888888">//motor setup</span>
+				  myMotorDriver.settings.commInterface <span style="color: #333333">=</span> I2C_MODE;
+				  myMotorDriver.settings.I2CAddress <span style="color: #333333">=</span> <span style="color: #005588; font-weight: bold">0x5D</span>; <span style="color: #888888">//config pattern is &quot;1000&quot; (default) on board for address 0x5D</span>
+				  myMotorDriver.settings.chipSelectPin <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">10</span>;
+				  <span style="color: #888888">//*****initialize the driver get wait for idle*****//</span>
+				  <span style="color: #008800; font-weight: bold">while</span> ( myMotorDriver.begin() <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0xA9</span> ) <span style="color: #888888">//Wait until a valid ID word is returned</span>
+				  {
+				    Serial.println( <span style="background-color: #fff0f0">&quot;ID mismatch, trying again&quot;</span> );
+				    delay(<span style="color: #0000DD; font-weight: bold">500</span>);
+				  }
+				  Serial.println( <span style="background-color: #fff0f0">&quot;ID matches 0xA9&quot;</span> );
+				  <span style="color: #888888">//  Check to make sure the driver is done looking for slaves before beginning</span>
+				  Serial.print(<span style="background-color: #fff0f0">&quot;Waiting for enumeration...&quot;</span>);
+				  <span style="color: #008800; font-weight: bold">while</span> ( myMotorDriver.ready() <span style="color: #333333">==</span> <span style="color: #007020">false</span> );
+				  <span style="color: #888888">// motor 1 inversion so that forward is the same for both motors</span>
+				  <span style="color: #008800; font-weight: bold">while</span> ( myMotorDriver.busy() ); <span style="color: #888888">//Waits until the SCMD is available.</span>
+				  myMotorDriver.inversionMode(<span style="color: #0000DD; font-weight: bold">1</span>, <span style="color: #0000DD; font-weight: bold">1</span>); <span style="color: #888888">//invert motor 1</span>
+				  <span style="color: #008800; font-weight: bold">while</span> ( myMotorDriver.busy() );
+				  myMotorDriver.enable();
+
+				  <span style="color: #888888">// sensor setup  </span>
+				  Wire.begin();
+				  <span style="color: #008800; font-weight: bold">if</span> (proximitySensor.begin() <span style="color: #333333">==</span> <span style="color: #007020">false</span>)
+				  {
+				    Serial.println(<span style="background-color: #fff0f0">&quot;Device not found. Please check wiring.&quot;</span>);
+				    <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #0000DD; font-weight: bold">1</span>); <span style="color: #888888">//Freeze!</span>
+				  }
+				  <span style="color: #008800; font-weight: bold">if</span> (distanceSensor.begin() <span style="color: #333333">!=</span> <span style="color: #0000DD; font-weight: bold">0</span>) <span style="color: #888888">//Begin returns 0 on a good init</span>
+				  {
+				    Serial.println(<span style="background-color: #fff0f0">&quot;Sensor failed to begin. Please check wiring. Freezing...&quot;</span>);
+				    <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #0000DD; font-weight: bold">1</span>);
+				  }
+				  Serial.println(<span style="background-color: #fff0f0">&quot;Sensors online!&quot;</span>);
+				  distanceSensor.setOffset(<span style="color: #0000DD; font-weight: bold">41</span>);
+				  distanceSensor.setTimingBudgetInMs(<span style="color: #0000DD; font-weight: bold">35</span>);
+				  distanceSensor.setIntermeasurementPeriod(<span style="color: #0000DD; font-weight: bold">5</span>);
+				  distanceSensor.setDistanceModeShort();
+				  distanceSensor.startRanging(); 
+				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">brakeForwards</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive left motor</span>
+				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">brakeBackwards</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive left motor</span>
+				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">stopWheels</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>); <span style="color: #888888">//drive left motor</span>
+				}
+				</pre></div>
+				<p>I utilized this within a while loop to see how fast the motors could go while adequately responding to “seeing” an obstacle.</p>
+				<video controls="controls" src="videos/lab5/quick_brake.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<br>
+				
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>(<span style="color: #333399; font-weight: bold">void</span>)
+				{
+				  <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #333333">!</span>distanceSensor.checkForDataReady())
+				  {
+				    delay(<span style="color: #0000DD; font-weight: bold">1</span>);
+				  }
+				  <span style="color: #333399; font-weight: bold">int</span> distance <span style="color: #333333">=</span> distanceSensor.getDistance(); <span style="color: #888888">//Get the result of the measurement from ToF sensor</span>
+				  
+				  byte rangeStatus <span style="color: #333333">=</span> distanceSensor.getRangeStatus();
+				  <span style="color: #008800; font-weight: bold">if</span>(rangeStatus<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span>) 
+				  {
+				    <span style="color: #008800; font-weight: bold">if</span>((distance<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span> <span style="color: #333333">||</span> distance<span style="color: #333333">&gt;</span><span style="color: #0000DD; font-weight: bold">300</span>) <span style="color: #333333">&amp;&amp;</span> proxValue<span style="color: #333333">&lt;</span><span style="color: #0000DD; font-weight: bold">80</span>)     {
+				      forward();
+				    }
+				    <span style="color: #008800; font-weight: bold">else</span>
+				    {
+				      brakeForwards();
+				      delay(<span style="color: #0000DD; font-weight: bold">200</span>);
+				      stopWheels()
+				      <span style="color: #008800; font-weight: bold">while</span>(<span style="color: #0000DD; font-weight: bold">1</span>);
+				    }
+				  }
+				}
+				</pre></div>
+				<p>Next the code was fleshed out to incorporate the proximity sensor and institute right hand wall follow. The latter didn’t come to full fruition (meaning turns weren’t 90 degrees, so the robot didn’t follow the wall) due to a frayed battery wire, but obstacle avoidance was achieved.</p>
+				<img src="images/lab5/frayed_battery.JPG" style="width:400px;height:500px;display:block;margin: 0 auto;">
+				<br>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>(<span style="color: #333399; font-weight: bold">void</span>)
+				{
+				  <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #333333">!</span>distanceSensor.checkForDataReady())
+				  {
+				    delay(<span style="color: #0000DD; font-weight: bold">1</span>);
+				  }
+				  <span style="color: #333399; font-weight: bold">int</span> distance <span style="color: #333333">=</span> distanceSensor.getDistance();
+				  <span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">int</span> proxValue <span style="color: #333333">=</span> proximitySensor.getProximity();  
+				  distanceSensor.clearInterrupt();
+				  
+				  byte rangeStatus <span style="color: #333333">=</span> distanceSensor.getRangeStatus();
+				  <span style="color: #008800; font-weight: bold">if</span>(rangeStatus<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span>) 
+				  {
+				    <span style="color: #008800; font-weight: bold">if</span>((distance<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span> <span style="color: #333333">||</span> distance<span style="color: #333333">&gt;</span><span style="color: #0000DD; font-weight: bold">300</span>) <span style="color: #333333">&amp;&amp;</span> proxValue<span style="color: #333333">&lt;</span><span style="color: #0000DD; font-weight: bold">80</span>)
+				    {
+				      forward();
+				    }
+				    <span style="color: #008800; font-weight: bold">else</span>
+				    {
+				      brakeForwards();
+				      delay(<span style="color: #0000DD; font-weight: bold">200</span>);
+				      turnRight();
+				      delay(<span style="color: #0000DD; font-weight: bold">1000</span>);
+				    }
+				  }
+				}
+				</pre></div>
+				<video controls="controls" src="videos/lab5/quick_stop.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<video controls="controls" src="videos/lab5/obstacle avoidance.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<p><i>Note: there's a chair just out of frame that the robot is reacting to</i></p>
+				<br>
+				<h1 class="mb-2 text-center">Part B: Virtual</h2>
+				<h2 class="mb-2 text-center">Objective</h2>
+				<p>Much like the previous lab, the physical environment was replicated within the virtual environment, utilizing Jupyter notebook and Python code for controlling virtual Klaus. </p>
+				<br>
+				<h2 class="mb-2 text-center">Obstacle Avoidance</h2>
+				<p>This started with baseline functions for movement and sensing. check_front() relied on the function get_laser_data from the robot class, which would return the distance to any object in the robot’s field of view. I determined 1 to be a valid threshold for avoidance, hence the if condition. turn_right() and turn_left() are self-explanatory, relying on setting the angular velocity.</p>
+				<p>The overall perform_obstacle_avoidance() function is implementing a right hand wall follow algorithm. If the robot doesn’t sense anything in front of it, it continues moving forward, otherwise it turns right. If an object can be detected then, the robot will turn to check to the left of it, otherwise it continues forward. If there’s still an object, it returns in the opposite direction from which it came.</p>
+				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">check_front</span>(robot):
+				    <span style="color: #008800; font-weight: bold">return</span> (robot<span style="color: #333333">.</span>get_laser_data() <span style="color: #333333">&lt;</span> <span style="color: #0000DD; font-weight: bold">1</span>)
+
+				<span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">turn_right</span>(robot):
+				    robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #333333">-</span><span style="color: #0000DD; font-weight: bold">50</span>)
+				    time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+
+				<span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">turn_left</span>(robot):
+				    robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">50</span>)
+				    time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+
+				<span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">perform_obstacle_avoidance</span>(robot):
+				    <span style="color: #008800; font-weight: bold">while</span> <span style="color: #008800; font-weight: bold">True</span>:
+				        <span style="color: #888888"># Obstacle avoidance code goes here</span>
+				        <span style="color: #008800; font-weight: bold">if</span> (check_front(robot)):
+				            turn_right(robot)
+				            robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
+				            time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+				            <span style="color: #008800; font-weight: bold">if</span> (check_front(robot)):
+				                turn_left(robot)
+				                turn_left(robot)
+				                robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
+				                time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+				                <span style="color: #008800; font-weight: bold">if</span> (check_front(robot)):
+				                    turn_left(robot)
+				                    robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
+				                    time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+				                <span style="color: #008800; font-weight: bold">else</span>:
+				                    robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
+				                    time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+				            <span style="color: #008800; font-weight: bold">else</span>:
+				                robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
+				                time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+				        <span style="color: #008800; font-weight: bold">else</span>:
+				            robot<span style="color: #333333">.</span>set_vel(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
+				            time<span style="color: #333333">.</span>sleep(<span style="color: #0000DD; font-weight: bold">1</span>)
+				        
+				           
+				perform_obstacle_avoidance(robot)
+				</pre></div>
+				<p>All sleep commands after set_vel() were set to 1 second, allowing for crisp 90 degree turns and straight forward movement. There was the option to have smaller turns if the robot detected an obstacle, which would lead to less deterministic and slower movement. I wanted to be able to easily debug the robot’s movements, hence 90 degree turns at obstacles.</p>
+				<p>A linear velocity of 1 with a time.sleep(1) was easy to predict. It also allowed for the robot to sometimes slide along the walls, rather than collide with them, since this set_vel() command spanned around the length of a grid square.</p>
+				<p>Something to note, as seen in the video below, is that although the code is valid in its logic, there is drift. This drift does eventually lead to collisions. A potential fix is to use while loops instead of time.sleep to determine how long to turn for. This will lead to more granular degrees of rotation, rather than exact 90 degree turns.</p>
+				<br>
+				<h1 class="mb-2 text-center">Conclusion</h1>
+				<p>Making a physical or virtual object autonomous is easier said than done. Reliance on sensors for data to respond to will make your code vulnerable to noise and errors. Calibration and robust logic can prevent some of these potential failures, but the world will always throw a curveball at you, whether it’s in the configuration of the robot or its external environment.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+	<footer class="ftco-footer ftco-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 text-center">
+					
+					<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+					</div>
+				</div>
+			</div>
+		</footer>
+		
+		
+
+		<!-- loader -->
+		<div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery-migrate-3.0.1.min.js"></script>
+		<script src="js/popper.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>
+		<script src="js/jquery.waypoints.min.js"></script>
+		<script src="js/jquery.stellar.min.js"></script>
+		<script src="js/owl.carousel.min.js"></script>
+		<script src="js/jquery.magnific-popup.min.js"></script>
+		<script src="js/jquery.animateNumber.min.js"></script>
+		<script src="js/scrollax.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+		<script src="js/google-map.js"></script>
+		<script src="js/main.js"></script>
+		
+	</body>
+	</html>
