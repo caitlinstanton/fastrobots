@@ -149,7 +149,7 @@
 				<img src="images/lab5/klaus_side_view.JPG" style="width:400px;height:500px;display:block;margin: 0 auto;">
 				<img src="images/lab5/klaus_top_view.JPG" style="width:400px;height:500px;display:block;margin: 0 auto;">
 				<p>After running some iterations of the obstacle avoidance code, I realized that the robot would perform correctly when suspended on a cup (i.e. stopping its wheels when my hand passed in front of the sensors) but not when moving on the ground. Adjusting the sensors with a zip tie to be angled more upwards fixed this, as the sensors were sensing the floor below them and therefore not even starting the wheels.</p>
-				<p>I built off my existing motion functions from previously labs to include brakeForwards(), brakeBackwards(), and stopWheels().</p>
+				<p>I built off my existing motion functions from previously labs to include brakeHard() and stopWheels().</p>
 				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #557799">#include &lt;Arduino.h&gt;</span>
 				<span style="color: #557799">#include &lt;stdint.h&gt;</span>
 				<span style="color: #557799">#include &quot;SCMD.h&quot;</span>
@@ -160,24 +160,23 @@
 				<span style="color: #557799">#include &lt;vl53l1x_class.h&gt;</span>
 				<span style="color: #557799">#include &lt;vl53l1_error_codes.h&gt;</span>
 				<span style="color: #557799">#include &lt;Wire.h&gt;</span>
-				<span style="color: #557799">#include &quot;SparkFun_VL53L1X.h&quot; </span>
+				<span style="color: #557799">#include &quot;SparkFun_VL53L1X.h&quot; </span><span style="color: #888888">//Click here to get the library: http://librarymanager/All#SparkFun_VL53L1X</span>
 				<span style="color: #557799">#include &quot;SparkFun_VCNL4040_Arduino_Library.h&quot;</span>
-				VCNL4040 proximitySensor;
 
 				<span style="color: #888888">//Optional interrupt and shutdown pins.</span>
 				<span style="color: #557799">#define SHUTDOWN_PIN 2</span>
 				<span style="color: #557799">#define INTERRUPT_PIN 3</span>
 
 				SCMD myMotorDriver; <span style="color: #888888">//This creates the main object of one motor driver and connected slaves.</span>
-
+				VCNL4040 proximitySensor;
 				SFEVL53L1X distanceSensor;
+
 				<span style="color: #888888">//Uncomment the following line to use the optional shutdown and interrupt pins.</span>
 				<span style="color: #888888">//SFEVL53L1X distanceSensor(Wire, SHUTDOWN_PIN, INTERRUPT_PIN);</span>
 
 				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">setup</span>(<span style="color: #333399; font-weight: bold">void</span>)
 				{
 				  Serial.begin(<span style="color: #0000DD; font-weight: bold">115200</span>);
-				  
 				  <span style="color: #888888">//motor setup</span>
 				  myMotorDriver.settings.commInterface <span style="color: #333333">=</span> I2C_MODE;
 				  myMotorDriver.settings.I2CAddress <span style="color: #333333">=</span> <span style="color: #005588; font-weight: bold">0x5D</span>; <span style="color: #888888">//config pattern is &quot;1000&quot; (default) on board for address 0x5D</span>
@@ -192,7 +191,7 @@
 				  <span style="color: #888888">//  Check to make sure the driver is done looking for slaves before beginning</span>
 				  Serial.print(<span style="background-color: #fff0f0">&quot;Waiting for enumeration...&quot;</span>);
 				  <span style="color: #008800; font-weight: bold">while</span> ( myMotorDriver.ready() <span style="color: #333333">==</span> <span style="color: #007020">false</span> );
-				  <span style="color: #888888">// motor 1 inversion so that forward is the same for both motors</span>
+				  <span style="color: #888888">// motor 1 inversion so that foward is the same for both motors</span>
 				  <span style="color: #008800; font-weight: bold">while</span> ( myMotorDriver.busy() ); <span style="color: #888888">//Waits until the SCMD is available.</span>
 				  myMotorDriver.inversionMode(<span style="color: #0000DD; font-weight: bold">1</span>, <span style="color: #0000DD; font-weight: bold">1</span>); <span style="color: #888888">//invert motor 1</span>
 				  <span style="color: #008800; font-weight: bold">while</span> ( myMotorDriver.busy() );
@@ -205,101 +204,135 @@
 				    Serial.println(<span style="background-color: #fff0f0">&quot;Device not found. Please check wiring.&quot;</span>);
 				    <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #0000DD; font-weight: bold">1</span>); <span style="color: #888888">//Freeze!</span>
 				  }
+				  <span style="color: #888888">//Serial.println(&quot;VL53L1X Qwiic Test&quot;);</span>
+				  <span style="color: #888888">//VL53L1_SetInterMeasurementPeriodMilliSeconds(&amp;VL53L1Dev, 1000 );</span>
 				  <span style="color: #008800; font-weight: bold">if</span> (distanceSensor.begin() <span style="color: #333333">!=</span> <span style="color: #0000DD; font-weight: bold">0</span>) <span style="color: #888888">//Begin returns 0 on a good init</span>
 				  {
 				    Serial.println(<span style="background-color: #fff0f0">&quot;Sensor failed to begin. Please check wiring. Freezing...&quot;</span>);
-				    <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #0000DD; font-weight: bold">1</span>);
+				    <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #0000DD; font-weight: bold">1</span>)
+				      ;
 				  }
-				  Serial.println(<span style="background-color: #fff0f0">&quot;Sensors online!&quot;</span>);
+				  Serial.println(<span style="background-color: #fff0f0">&quot;Sensor online!&quot;</span>);
 				  distanceSensor.setOffset(<span style="color: #0000DD; font-weight: bold">41</span>);
 				  distanceSensor.setTimingBudgetInMs(<span style="color: #0000DD; font-weight: bold">35</span>);
 				  distanceSensor.setIntermeasurementPeriod(<span style="color: #0000DD; font-weight: bold">5</span>);
 				  distanceSensor.setDistanceModeShort();
-				  distanceSensor.startRanging(); 
+				  distanceSensor.startRanging(); <span style="color: #888888">//just continue ranging the whole time to save time turning it on/off</span>
 				}
 
-				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">brakeForwards</span>() {
-				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive right motor</span>
-				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive left motor</span>
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">forward</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">100</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">125</span>); <span style="color: #888888">//drive left motor</span>
 				}
 
-				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">brakeBackwards</span>() {
-				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive right motor</span>
-				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">255</span>); <span style="color: #888888">//drive left motor</span>
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">backward</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">100</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">125</span>); <span style="color: #888888">//drive left motor</span>
+				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">turnRight</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">200</span>); <span style="color: #888888">//drive right motor</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">200</span>); <span style="color: #888888">//drive left motor</span>
 				}
 
 				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">stopWheels</span>() {
 				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>); <span style="color: #888888">//drive right motor</span>
 				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>); <span style="color: #888888">//drive left motor</span>
 				}
+
+				<span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">brakeHard</span>() {
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">200</span>);<span style="color: #888888">//reverse for a touch</span>
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">200</span>);
+				  delay(<span style="color: #0000DD; font-weight: bold">200</span>);
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>);
+				  myMotorDriver.setDrive(<span style="color: #0000DD; font-weight: bold">1</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>);
+				}
 				</pre></div>
+
 				<p>I utilized this within a while loop to see how fast the motors could go while adequately responding to “seeing” an obstacle.</p>
 				<video controls="controls" src="videos/lab5/quick_brake.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
 				    Your browser does not support the HTML5 Video element.
 				</video>
 				<br>
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/l8HD4LeNz1Q" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<video controls="controls" src="videos/lab5/quick_brake_2.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
+				    Your browser does not support the HTML5 Video element.
+				</video>
+				<br>
+				<iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/l8HD4LeNz1Q" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>(<span style="color: #333399; font-weight: bold">void</span>)
 				{
 				  <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #333333">!</span>distanceSensor.checkForDataReady())
 				  {
 				    delay(<span style="color: #0000DD; font-weight: bold">1</span>);
 				  }
-				  <span style="color: #333399; font-weight: bold">int</span> distance <span style="color: #333333">=</span> distanceSensor.getDistance(); <span style="color: #888888">//Get the result of the measurement from ToF sensor</span>
+				  <span style="color: #333399; font-weight: bold">int</span> distance <span style="color: #333333">=</span> distanceSensor.getDistance(); <span style="color: #888888">//Get the result of the measurement from the ToF sensor</span>
+				  <span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">int</span> proxValue <span style="color: #333333">=</span> proximitySensor.getProximity();  <span style="color: #888888">//Get result from prox sensor</span>
+				  distanceSensor.clearInterrupt();
+
+				  Serial.print(<span style="background-color: #fff0f0">&quot;Distance(mm): &quot;</span>);
+				  Serial.print(distance);
+				  Serial.print(<span style="background-color: #fff0f0">&quot;, &quot;</span>);
+				  Serial.print(distanceSensor.getRangeStatus());
+				  Serial.print(<span style="background-color: #fff0f0">&quot;</span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\t</span><span style="background-color: #fff0f0">Prox: &quot;</span>);
+				  Serial.print(proxValue);
+				  Serial.print(<span style="background-color: #fff0f0">&quot;</span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\n</span><span style="background-color: #fff0f0">&quot;</span>);
 				  
 				  byte rangeStatus <span style="color: #333333">=</span> distanceSensor.getRangeStatus();
-				  <span style="color: #008800; font-weight: bold">if</span>(rangeStatus<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span>) 
+				  <span style="color: #008800; font-weight: bold">if</span>(rangeStatus<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span>)  <span style="color: #888888">//only act if sensor reading was good</span>
 				  {
-				    <span style="color: #008800; font-weight: bold">if</span>((distance<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span> <span style="color: #333333">||</span> distance<span style="color: #333333">&gt;</span><span style="color: #0000DD; font-weight: bold">300</span>) <span style="color: #333333">&amp;&amp;</span> proxValue<span style="color: #333333">&lt;</span><span style="color: #0000DD; font-weight: bold">80</span>)     {
+				    <span style="color: #008800; font-weight: bold">if</span>((distance<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span> <span style="color: #333333">||</span> distance<span style="color: #333333">&gt;</span><span style="color: #0000DD; font-weight: bold">300</span>)) <span style="color: #888888">//0 if there is no object nearby</span>
+				    {
 				      forward();
 				    }
 				    <span style="color: #008800; font-weight: bold">else</span>
 				    {
-				      brakeForwards();
-				      delay(<span style="color: #0000DD; font-weight: bold">200</span>);
-				      stopWheels()
+				      brakeHard();
+				      delay(<span style="color: #0000DD; font-weight: bold">400</span>);
 				      <span style="color: #008800; font-weight: bold">while</span>(<span style="color: #0000DD; font-weight: bold">1</span>);
 				    }
 				  }
 				}
 				</pre></div>
-				<p>Next the code was fleshed out to incorporate the proximity sensor and institute right hand wall follow. The latter didn’t come to full fruition (meaning turns weren’t 90 degrees, so the robot didn’t follow the wall) due to a frayed battery wire, but obstacle avoidance was achieved.</p>
-				<img src="images/lab5/frayed_battery.JPG" style="width:400px;height:500px;display:block;margin: 0 auto;">
-				<br>
+
+				<p>Next the code was fleshed out to incorporate the proximity sensor and institute turning, rather than braking, when seeing an obstacle. The proximity sensor's existence didn't do much to affect the motion of the robot, but it was helpful to have a double check.</p>
 				<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">loop</span>(<span style="color: #333399; font-weight: bold">void</span>)
 				{
 				  <span style="color: #008800; font-weight: bold">while</span> (<span style="color: #333333">!</span>distanceSensor.checkForDataReady())
 				  {
 				    delay(<span style="color: #0000DD; font-weight: bold">1</span>);
 				  }
-				  <span style="color: #333399; font-weight: bold">int</span> distance <span style="color: #333333">=</span> distanceSensor.getDistance();
-				  <span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">int</span> proxValue <span style="color: #333333">=</span> proximitySensor.getProximity();  
+				  <span style="color: #333399; font-weight: bold">int</span> distance <span style="color: #333333">=</span> distanceSensor.getDistance(); <span style="color: #888888">//Get the result of the measurement from the ToF sensor</span>
+				  <span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">int</span> proxValue <span style="color: #333333">=</span> proximitySensor.getProximity();  <span style="color: #888888">//Get result from prox sensor</span>
 				  distanceSensor.clearInterrupt();
+
+				<span style="color: #888888">//  Serial.print(&quot;Distance(mm): &quot;);</span>
+				<span style="color: #888888">//  Serial.print(distance);</span>
+				<span style="color: #888888">//  Serial.print(&quot;, &quot;);</span>
+				<span style="color: #888888">//  Serial.print(distanceSensor.getRangeStatus());</span>
+				<span style="color: #888888">//  Serial.print(&quot;\tProx: &quot;);</span>
+				<span style="color: #888888">//  Serial.print(proxValue);</span>
+				<span style="color: #888888">//  Serial.print(&quot;\n&quot;);</span>
 				  
 				  byte rangeStatus <span style="color: #333333">=</span> distanceSensor.getRangeStatus();
-				  <span style="color: #008800; font-weight: bold">if</span>(rangeStatus<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span>) 
+				  <span style="color: #008800; font-weight: bold">if</span>(rangeStatus<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span>)  <span style="color: #888888">//only act if sensor reading was good</span>
 				  {
-				    <span style="color: #008800; font-weight: bold">if</span>((distance<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span> <span style="color: #333333">||</span> distance<span style="color: #333333">&gt;</span><span style="color: #0000DD; font-weight: bold">300</span>) <span style="color: #333333">&amp;&amp;</span> proxValue<span style="color: #333333">&lt;</span><span style="color: #0000DD; font-weight: bold">80</span>)
+				    <span style="color: #008800; font-weight: bold">if</span>((distance<span style="color: #333333">==</span><span style="color: #0000DD; font-weight: bold">0</span> <span style="color: #333333">||</span> distance<span style="color: #333333">&gt;</span><span style="color: #0000DD; font-weight: bold">300</span>) <span style="color: #333333">&amp;&amp;</span> proxValue<span style="color: #333333">&lt;</span><span style="color: #0000DD; font-weight: bold">20</span>) <span style="color: #888888">//0 if there is no object nearby</span>
 				    {
 				      forward();
 				    }
 				    <span style="color: #008800; font-weight: bold">else</span>
 				    {
-				      brakeForwards();
-				      delay(<span style="color: #0000DD; font-weight: bold">200</span>);
 				      turnRight();
-				      delay(<span style="color: #0000DD; font-weight: bold">1000</span>);
+				      delay(<span style="color: #0000DD; font-weight: bold">200</span>);
 				    }
 				  }
-				}
 				</pre></div>
-				<video controls="controls" src="videos/lab5/quick_stop.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
-				    Your browser does not support the HTML5 Video element.
-				</video>
-				<video controls="controls" src="videos/lab5/obstacle avoidance.MOV" style="width:500px;height:300px; display:block;margin: 0 auto;">
-				    Your browser does not support the HTML5 Video element.
-				</video>
-				<p><i>Note: there's a chair just out of frame that the robot is reacting to</i></p>
+				<p>It took some tuning with respect to the turning and braking functions. Here are a few examples of what went wrong. The first video has too much motor drive for the turning function, the second has too much motor drive for the braking function, and the third has too little delay for the turning function.</p>
+				<iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/d8-4i0FyCcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/6db0frnrYGY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/O83_5zRkocM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<p>Finally, with a ton of tweaking, I was able to get a relatively robust obstacle avoidance program (code shown above).</p>
+				<iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/BymdHUhILcc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<br>
 				<h1 class="mb-2 text-center">Part B: Virtual</h2>
 				<h2 class="mb-2 text-center">Objective</h2>
@@ -348,11 +381,11 @@
 				           
 				perform_obstacle_avoidance(robot)
 				</pre></div>
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/M7t_hfpyY7U" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/M7t_hfpyY7U" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<p>All sleep commands after set_vel() were set to 1 second, allowing for crisp 90 degree turns and straight forward movement. There was the option to have smaller turns if the robot detected an obstacle, which would lead to less deterministic and slower movement. I wanted to be able to easily debug the robot’s movements, hence 90 degree turns at obstacles.</p>
 				<p>A linear velocity of 1 with a time.sleep(1) was easy to predict. It also allowed for the robot to sometimes slide along the walls, rather than collide with them, since this set_vel() command spanned around the length of a grid square.</p>
 				<p>Something to note, as seen in the video below, is that although the code is valid in its logic, there is drift. This drift does eventually lead to collisions. A potential fix is to use while loops instead of time.sleep to determine how long to turn for. This will lead to more granular degrees of rotation, rather than exact 90 degree turns.</p>
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/V2RK3F-79XQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/V2RK3F-79XQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				<br>
 				<h1 class="mb-2 text-center">Conclusion</h1>
 				<p>Making a physical or virtual object autonomous is easier said than done. Reliance on sensors for data to respond to will make your code vulnerable to noise and errors. Calibration and robust logic can prevent some of these potential failures, but the world will always throw a curveball at you, whether it’s in the configuration of the robot or its external environment.</p>
