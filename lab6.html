@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ECE 4960 Fast Robots</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css/animate.css">
+	
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	
+	<link rel="stylesheet" href="css/flaticon.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="oi oi-menu"></span> Menu
+			</button>
+
+			<div class="collapse navbar-collapse" id="ftco-nav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+					<!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+					<!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- END nav -->
+
+	<section class="hero-wrap degree-right js-fullheight">
+		<div class="home-slider js-fullheight owl-carousel">
+			<div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+				<div class="overlay"></div>
+				<div class="container">
+					<div class="row no-gutters slider-text js-fullheight align-items-center">
+						<div class="col-md-12 ftco-animate">
+							<div class="text">
+								<h1 class="mb-4">Lab 6</h1>
+								<p>IMU, PID, and Odometry</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="ftco-section ftco-portfolio bg-light">
+		<div class="row justify-content-center no-gutters">
+			<div class="col-md-8 heading-section ftco-animate mb-5">
+				<h1 class="mb-2 text-center">Part A: Physical</h2>
+				<h2 class="mb-2 text-center">Objective</h2>
+				
+				<h1 class="mb-2 text-center">Part B: Virtual</h2>
+        <h2 class="mb-2 text-center">Objective</h2>
+        <p>It’s critical for the robot to not only be able to gather sensor data, but more importantly to be able to gather accurate sensor data. In the case of the simulator, the robot is able to output its odometry and ground truth pose estimates. Odometry is defined as the use of data from onboard sensors to estimate change in position over time, while ground truth is the most accurate measurement available. Utilizing the virtual robot and its accompanying plotter, this part of the lab was meant to illustrate the range of discrepancies between odometry and ground truth.
+        </p>
+        <h2 class="mb-2 text-center">Simulating and Plotting</h2>
+        <p>In a similar workflow to the previous simulation labs, a lab manager was provided; it held the simulator to display the virtual robot’s movements, the teleop key to register controls for the virtual robot, and the plotter to graph odometry versus ground truth.
+        </p>
+        <p>The pose estimates for both odometry and ground truth both returned tuples of (x, y, yaw); only x and y were relevant for graphing.</p>
+        <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pose <span style="color: #333333">=</span> robot.get_pose()
+        print(<span style="background-color: #fff0f0">&quot;Robot Odom Pose: &quot;</span>, pose)
+        gt_pose <span style="color: #333333">=</span> robot.get_gt_pose()
+        print(<span style="background-color: #fff0f0">&quot;Ground Truth Pose: &quot;</span>, gt_pose)
+        </pre></div>
+        <p>Sending data to the plotter was straightforward with the helper function <code>robot.send_to_plot(x,y,type)</code> where x and y were the coordinates and type was either ODOM (for odometry) or GT (for ground truth). The latter parameter allowed for the odometry and ground truth lines to be graphed separately.
+        </p>
+        <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">def update_plot(robot)<span style="color: #333333">:</span>
+        <span style="color: #008800; font-weight: bold">while</span> True<span style="color: #333333">:</span>
+        start <span style="color: #333333">=</span> time.perf_counter()
+        pose <span style="color: #333333">=</span> robot.get_pose()
+        gt_pose <span style="color: #333333">=</span> robot.get_gt_pose()
+        robot.send_to_plot(pose[<span style="color: #0000DD; font-weight: bold">0</span>], pose[<span style="color: #0000DD; font-weight: bold">1</span>], ODOM)
+        robot.send_to_plot(gt_pose[<span style="color: #0000DD; font-weight: bold">0</span>], gt_pose[<span style="color: #0000DD; font-weight: bold">1</span>], GT)
+        end <span style="color: #333333">=</span> time.perf_counter()
+        print(end<span style="color: #333333">-</span>start)
+        <span style="color: #FF0000; background-color: #FFAAAA">#</span>time.sleep(<span style="color: #0000DD; font-weight: bold">200</span>)
+        </pre></div>
+        <p>The code above took the helper functions for getting pose estimates and sending data points to plot in order to graph trends in ground truth and odometry. Using time.perf_counter(), I found these data points were sent to the plotter on an average of every 605.776µs (with a standard deviation of 1638.458µs), equivalent to a frequency of 1650.7752Hz.
+        </p>
+        <p>The ground truth data points are extremely stable, maintaining the same shape consistently over time. On the other hand, the odometry data points are scattered and have a tendency to drift. Additionally, the coordinates for the two datasets were vastly different, often with both plots in opposite corners of the coordinate plane. </p>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/x1bmjUYkRXY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <p>When the robot was stationary, the ground truth would be plotted as a single point whereas the odometry became a point cloud. When the robot was making regular loops, the ground truth was graphed as a perfect circle while the odometry was a loose loop that drifted, forming almost a coil inthe 2D space.</p>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/4i20XGjnoR8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <p>As evidenced by the video below, the noise in the odometry pose seemed to worsen as the time the robot was in motion increased. With respect to speed, noise increased as linear speed increased but not as angular speed increased.</p>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/-GM2DEid9CA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+		</div>
+	</section>
+
+	<!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+	<footer class="ftco-footer ftco-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 text-center">
+					
+					<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+					</div>
+				</div>
+			</div>
+		</footer>
+		
+		
+
+		<!-- loader -->
+		<div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery-migrate-3.0.1.min.js"></script>
+		<script src="js/popper.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>
+		<script src="js/jquery.waypoints.min.js"></script>
+		<script src="js/jquery.stellar.min.js"></script>
+		<script src="js/owl.carousel.min.js"></script>
+		<script src="js/jquery.magnific-popup.min.js"></script>
+		<script src="js/jquery.animateNumber.min.js"></script>
+		<script src="js/scrollax.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+		<script src="js/google-map.js"></script>
+		<script src="js/main.js"></script>
+		
+	</body>
+	</html>
