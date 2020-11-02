@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ECE 4960 Fast Robots</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css/animate.css">
+	
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	
+	<link rel="stylesheet" href="css/flaticon.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="oi oi-menu"></span> Menu
+			</button>
+
+			<div class="collapse navbar-collapse" id="ftco-nav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+					<!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+					<!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- END nav -->
+
+	<section class="hero-wrap degree-right js-fullheight">
+		<div class="home-slider js-fullheight owl-carousel">
+			<div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+				<div class="overlay"></div>
+				<div class="container">
+					<div class="row no-gutters slider-text js-fullheight align-items-center">
+						<div class="col-md-12 ftco-animate">
+							<div class="text">
+								<h1 class="mb-4">Lab 8</h1>
+								<p>Grid Localization using Bayes Filter</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="ftco-section ftco-portfolio bg-light">
+		<div class="row justify-content-center no-gutters">
+			<div class="col-md-8 heading-section ftco-animate mb-5">
+				<h2 class="mb-2 text-center">Objective</h2>
+        <p>After writing out pseudocode to implement a Bayes Filter in the last lab, this week was focused on fleshing out the proposed program. The Bayes Filter code takes in sensor data, calculates probabilities, and plots the belief of the robot as it moves around its environment.</p> 
+        <img src="images/lab8/bayes_filter.png" style="width:1000px;height:400px;display:block;margin: 0 auto;">
+        <h2 class="mb-2 text-center">The Process</h2>
+        <p>The simulated robot took time at the top of the program to execute its programmed motion around its environment in order to gather sensor data. At every coordinate, it would stop and rotate 360 degrees to gather 18 pieces of sensor data from the same distance from obstacles, just varying degrees. Once this was done, the robot repeated its trajectory and utilized this observed sensor data, along with real-time values from its odometry, to not only “sense” where it was but (more importantly) predict where it was.</p>
+        <h2 class="mb-2 text-center">The Code</h2>
+        <p>In addition to the helper functions provided by the robot.py interface, I imported a few functions from the math library in Python. These functions (atan2, pi, and hypot) were used within the compute_control function to calculate the control sequence of the robot between two given poses (x, y, theta).
+        </p>
+        <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">compute_control</span>(cur_pose, prev_pose):
+        <span style="color: #DD4422">&quot;&quot;&quot; Given the current and previous odometry poses, this function extracts</span>
+        <span style="color: #DD4422">    the control information based on the odometry motion model.</span>
+        
+        <span style="color: #DD4422">    Args:</span>
+        <span style="color: #DD4422">        cur_pose  ([Pose]): Current Pose</span>
+        <span style="color: #DD4422">        prev_pose ([Pose]): Previous Pose </span>
+        
+        <span style="color: #DD4422">    Returns:</span>
+        <span style="color: #DD4422">        [delta_rot_1]: Rotation 1  (degrees)</span>
+        <span style="color: #DD4422">        [delta_trans]: Translation (meters)</span>
+        <span style="color: #DD4422">        [delta_rot_2]: Rotation 2  (degrees)</span>
+        <span style="color: #DD4422">    &quot;&quot;&quot;</span>
+        
+            <span style="color: #888888">#this is equal to the amount of translational change in x</span>
+            delta_x <span style="color: #333333">=</span> cur_pose[<span style="color: #0000DD; font-weight: bold">0</span>] <span style="color: #333333">-</span> prev_pose[<span style="color: #0000DD; font-weight: bold">0</span>] 
+            <span style="color: #888888">#this is equal to the amount of translational change in y</span>
+            delta_y <span style="color: #333333">=</span> cur_pose[<span style="color: #0000DD; font-weight: bold">1</span>] <span style="color: #333333">-</span> prev_pose[<span style="color: #0000DD; font-weight: bold">1</span>] 
+            <span style="color: #888888">#this is equal to the amount of rotational change in yaw (converted from radians to degrees)</span>
+            <span style="color: #888888">#angular change due to a change in position is equal to tan of change in y/change</span>
+            delta_turn <span style="color: #333333">=</span> atan2(delta_y, delta_x)<span style="color: #333333">*</span><span style="color: #0000DD; font-weight: bold">180</span><span style="color: #333333">/</span>pi 
+            
+            <span style="color: #888888">#this is equal to the rotational change from the starting angle</span>
+            delta_rot_1 <span style="color: #333333">=</span> loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>normalize_angle(delta_turn <span style="color: #333333">-</span> prev_pose[<span style="color: #0000DD; font-weight: bold">2</span>])
+            <span style="color: #888888">#this is equal to the Euclidean distance between the starting and ending points</span>
+            <span style="color: #888888">#delta_trans = sqrt((delta_x ** 2) + (delta_y ** 2))</span>
+            delta_trans <span style="color: #333333">=</span> hypot(delta_x, delta_y)
+            <span style="color: #888888">#this is equal to the rotational change from the ending angle</span>
+            delta_rot_2 <span style="color: #333333">=</span> loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>normalize_angle(cur_pose[<span style="color: #0000DD; font-weight: bold">2</span>] <span style="color: #333333">-</span> delta_turn)
+        
+            <span style="color: #008800; font-weight: bold">return</span> delta_rot_1, delta_trans, delta_rot_2
+        </pre></div>
+        <p>The next function is odom_motion_model, which takes in the control information from the previous function, as well as the previous and current poses of the robot, in order to output the transition probability. This is equivalent to the conditional probability of the current state, given the previous state and the control information. This function ended up being the most pivotal to the integrity of the simulated data, as my original implementation relied on local variables too heavily, which caused my kernel to break a few times. 
+        </p>
+
+        <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">odom_motion_model</span>(cur_pose, prev_pose, u):
+        <span style="background-color: #fff0f0">&quot;&quot;&quot; Odometry Motion Model</span>
+
+        <span style="background-color: #fff0f0">    Args:</span>
+        <span style="background-color: #fff0f0">        cur_pose  ([Pose]): Current Pose</span>
+        <span style="background-color: #fff0f0">        prev_pose ([Pose]): Previous Pose</span>
+        <span style="background-color: #fff0f0">        (rot1, trans, rot2) (float, float, float): A tuple with control data in the format </span>
+        <span style="background-color: #fff0f0">                                                   format (rot1, trans, rot2) with units (degrees, meters, degrees)</span>
+        
+        
+        <span style="background-color: #fff0f0">    Returns:</span>
+        <span style="background-color: #fff0f0">        prob [float]: Probability p(x&#39;|x, u)</span>
+        <span style="background-color: #fff0f0">   “”” </span>
+        <span style="background-color: #fff0f0">     #This is an implementation of the Bayes filter following the Markov assumption on state x_t (cur_pose)</span>
+        <span style="background-color: #fff0f0">    #Transition probability/action model for the prediction step</span>
+        <span style="background-color: #fff0f0">    #It specifies how the robot state evolves over time as a function of robot controls u_t</span>
+        <span style="background-color: #fff0f0">    #p(x&#39;|x,u) = (p(x,u | x&#39;) * p(x&#39;)) / (p(x,u)) = eta * p(x,u | x&#39;) * p(x&#39;)</span>
+        <span style="background-color: #fff0f0">   computed_control = compute_control(cur_pose, prev_pose)</span>
+        <span style="background-color: #fff0f0">    </span>
+        <span style="background-color: #fff0f0">   #calculate probability of each condition </span>
+        <span style="background-color: #fff0f0">  #left as comments for understanding</span>
+        <span style="background-color: #fff0f0">    #prob1 = loc.gaussian(delta_trans, u[0], loc.odom_trans_sigma)</span>
+        <span style="background-color: #fff0f0">    #prob2 = loc.gaussian(delta_rot_1, u[1], loc.odom_rot_sigma)</span>
+        <span style="background-color: #fff0f0">    #prob3 = loc.gaussian(delta_rot_2, u[2], loc.odom_rot_sigma)</span>
+        <span style="background-color: #fff0f0">#multiplication due to independence between event probabilities</span>
+        <span style="background-color: #fff0f0">#prob = prob1*prob2*prob3 </span>
+        
+        <span style="background-color: #fff0f0">    # faster implementation:</span>
+        <span style="background-color: #fff0f0">    prob = loc.gaussian(computed_control[0], u[0], loc.odom_rot_sigma) * loc.gaussian(computed_control[1], u[1], loc.odom_trans_sigma) * loc.gaussian(computed_control[2], u[2], loc.odom_rot_sigma)</span>
+        <span style="background-color: #fff0f0">    return prob</span>
+        </pre></div>
+    
+        <p>For the Bayes filter to be properly applied, steps must occur over all possible current events. In the case of the robot, this means all possible combinations of x, y, and theta must be tried for the prediction_step and update_step functions. There will naturally be events whose probabilities are zero or extremely close to zero (i.e. less than 0.0001), and these can be ignored in future calculations for the belief probabilities. 
+        </p>
+
+        <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">prediction_step</span>(cur_odom, prev_odom):
+        <span style="color: #DD4422">&quot;&quot;&quot; Prediction step of the Bayes Filter.</span>
+        <span style="color: #DD4422">    Update the probabilities in loc.bel_bar based on loc.bel from the previous time step and the odometry motion model.</span>
+        
+        <span style="color: #DD4422">    Args:</span>
+        <span style="color: #DD4422">        cur_odom  ([Pose]): Current Pose</span>
+        <span style="color: #DD4422">        prev_odom ([Pose]): Previous Pose</span>
+        <span style="color: #DD4422">    &quot;&quot;&quot;</span>
+            <span style="color: #888888">#MAX_CELLS_X: Maximum number of grid cells in the X direction.</span>
+            <span style="color: #888888">#MAX_CELLS_Y: Maximum number of grid cells in the Y direction.</span>
+            <span style="color: #888888">#MAX_CELLS_A: Maximum number of grid cells in the theta direction (&#39;A&#39; stands for &#39;Angle&#39;).</span>
+            <span style="color: #888888">#OBS_PER_CELL: Number of observations per cell. This is set to 18.</span>
+            <span style="color: #888888">#obs_views: A 4D Numpy array where the first three dimensions represents the cell index (cx, cy, ca) and the fourth dimension represents the precached true measurements (views)</span>
+            
+            <span style="color: #888888">#this is equal to the control information of the robot</span>
+        
+            u <span style="color: #333333">=</span> compute_control(cur_odom, prev_odom) 
+            <span style="color: #888888">#this is to find the probability of p(x&#39;|x,u), state transition probability</span>
+            <span style="color: #888888">#prob = odom_motion_model(cur_odom, prev_odom, u) </span>
+            <span style="color: #888888">#these loops are to step through every possible previous state (x,y.a)</span>
+            <span style="color: #888888">#this is because every state in &quot;bel_bar&quot; needs to be updated based on &quot;bel&quot; from the previous time step and the odometry motion model</span>
+            <span style="color: #008800; font-weight: bold">for</span> x <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>,loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>MAX_CELLS_X):
+                <span style="color: #008800; font-weight: bold">for</span> y <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>,loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>MAX_CELLS_Y):
+                    <span style="color: #008800; font-weight: bold">for</span> a <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>,loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>MAX_CELLS_A):
+                        <span style="color: #888888">#this is equivalent to skipping a cell if the probability of its state is 0 (since 0.0001 is close to 0)</span>
+                        <span style="color: #008800; font-weight: bold">if</span> loc<span style="color: #333333">.</span>bel[x, y, a] <span style="color: #333333">&gt;</span> <span style="color: #6600EE; font-weight: bold">0.0001</span>:
+                            <span style="color: #888888">#these loops are to step through every possible previous state (x,y.a)</span>
+                            <span style="color: #888888">#this is because every state in &quot;bel_bar&quot; needs to be updated based on &quot;bel&quot; from the previous time step and the odometry motion model</span>
+                            <span style="color: #008800; font-weight: bold">for</span> curr_x <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>,loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>MAX_CELLS_X):
+                                <span style="color: #008800; font-weight: bold">for</span> curr_y <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>,loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>MAX_CELLS_Y):
+                                    <span style="color: #008800; font-weight: bold">for</span> curr_a <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>,loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>MAX_CELLS_A):
+                                        loc<span style="color: #333333">.</span>bel_bar[curr_x, curr_y, curr_a] <span style="color: #333333">=</span> loc<span style="color: #333333">.</span>bel_bar[curr_x, curr_y, curr_a] <span style="color: #333333">+</span> odom_motion_model(loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>from_map(curr_x, curr_y, curr_a), mapper<span style="color: #333333">.</span>from_map(x, y, a), u) <span style="color: #333333">*</span> loc<span style="color: #333333">.</span>bel[x, y, a]		
+        </pre></div>
+    
+        <p>The sensor_model function is one that resulted in a computationally correct Bayes filter belief plot, but required slightly more time to work. As per suggestions on the lab page, I did my best to reduce the amount of local variables and unnecessary function calls as possible so as to speed up the filtering of the robot’s odometry data. It’s for this reason that sensor_model ultimately wasn’t used in my final version of the update_step function.        </p>
+        
+        <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">sensor_model</span>(obs, x_t):
+        <span style="color: #DD4422">&quot;&quot;&quot; This is the equivalent of p(z|x).</span>
+
+
+        <span style="color: #DD4422">    Args:</span>
+        <span style="color: #DD4422">        obs ([ndarray]): A 1D array consisting of the measurements made in rotation loop</span>
+        <span style="color: #DD4422">        x_t ([Pose]): State x of time t</span>
+        <span style="color: #DD4422">        </span>
+        <span style="color: #DD4422">    Returns:</span>
+        <span style="color: #DD4422">        [ndarray]: Returns a 1D array of size 18 (=loc.OBS_PER_CELL) with the likelihood of each individual measurements</span>
+        <span style="color: #DD4422">    &quot;&quot;&quot;</span>
+            <span style="color: #888888">#Calculating measurement probability</span>
+            <span style="color: #888888">#It specifies how the measurements are generated from the robot state x_t</span>
+            <span style="color: #888888">#p(z|x) = p(x|z) * p(z) / p(x) = eta * p(x|z) * p(z)</span>
+                                
+            prob_array <span style="color: #333333">=</span> []
+            <span style="color: #888888">#this is to loop over all 18 (OBS_PER_CELL) observations made by the robot </span>
+            <span style="color: #008800; font-weight: bold">for</span> i <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>, loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>OBS_PER_CELL):
+                <span style="color: #888888">#this is equal to the probability of finding the observation data in a normal Gaussian distribution gaussian(x, mu, sigma) </span>
+                <span style="color: #888888">#this normal distribution is centered around the current state&#39;s views and has a standard deviation of the sensor_sigma</span>
+                prob_array<span style="color: #333333">.</span>append(loc<span style="color: #333333">.</span>gaussian(obs[i], loc<span style="color: #333333">.</span>mapper<span style="color: #333333">.</span>obs_views[x_t[<span style="color: #0000DD; font-weight: bold">0</span>], x_t[<span style="color: #0000DD; font-weight: bold">1</span>], x_t[<span style="color: #0000DD; font-weight: bold">2</span>]], loc<span style="color: #333333">.</span>sensor_sigma))
+                                
+            <span style="color: #008800; font-weight: bold">return</span> prob_array
+        
+        <span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">update_step</span>():
+            <span style="color: #DD4422">&quot;&quot;&quot; Update step of the Bayes Filter.</span>
+        <span style="color: #DD4422">    Update the probabilities in loc.bel based on loc.bel_bar and the sensor model.</span>
+        <span style="color: #DD4422">    &quot;&quot;&quot;</span>
+            <span style="color: #888888">#these loops are to step through every possible current state (x,y.a)</span>
+            <span style="color: #888888">#this is because every state in &quot;bel&quot; needs to be updated based on &quot;bel_bar&quot; and the sensor model from the current time step</span>
+        
+            <span style="color: #008800; font-weight: bold">for</span> x <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>, mapper<span style="color: #333333">.</span>MAX_CELLS_X):
+                <span style="color: #008800; font-weight: bold">for</span> y <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>, mapper<span style="color: #333333">.</span>MAX_CELLS_Y):
+                    <span style="color: #008800; font-weight: bold">for</span> a <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #0000DD; font-weight: bold">0</span>, mapper<span style="color: #333333">.</span>MAX_CELLS_A):
+                        <span style="color: #888888">#this is equivalent to skipping a cell if the probability of its state is 0 (since 0.0001 is close to 0)</span>
+                        <span style="color: #008800; font-weight: bold">if</span> loc<span style="color: #333333">.</span>bel_bar[x, y, a] <span style="color: #333333">&gt;</span> <span style="color: #6600EE; font-weight: bold">0.0001</span>:
+                            <span style="color: #888888">#this is to update the value of the current state&#39;s belief</span>
+                            <span style="color: #888888">#loc.bel[x, y, a] =  np.prod(sensor_model(loc.obs_range_data, (x, y, a))) * loc.bel_bar[x, y, a]</span>
+                            loc<span style="color: #333333">.</span>bel[x, y, a] <span style="color: #333333">=</span> np<span style="color: #333333">.</span>prod(loc<span style="color: #333333">.</span>gaussian(loc<span style="color: #333333">.</span>obs_range_data, mapper<span style="color: #333333">.</span>obs_views[x, y, a, :], loc<span style="color: #333333">.</span>sensor_sigma)) <span style="color: #333333">*</span> loc<span style="color: #333333">.</span>bel_bar[x, y, a]
+            <span style="color: #888888">#this is to normalize the current state&#39;s belief (equivalent to multiplying by eta)</span>
+                            loc<span style="color: #333333">.</span>bel <span style="color: #333333">=</span> loc<span style="color: #333333">.</span>bel <span style="color: #333333">/</span> np<span style="color: #333333">.</span>sum(loc<span style="color: #333333">.</span>bel) 
+        </pre></div>
+    
+        <p>This video shows the entire process of the kernel restarting in Jupyter Lab, the robot precaching observations, executing its trajectory, and plotting the estimated belief after being fed through the Bayes filter. This video is around 9 minutes long, so if you want to get right to the Bayes filter skip to around 2:25.
+        </p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315" src="https://www.youtube.com/embed/XF1BtmSlMrM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+        <p>Here is a screenshot of the resulting plot. Green is the ground truth data from the sensors, yellow is the belief, and blue is the odometry. It’s not hard to spot how drastically different the odometry data is from the actual environment, so, even with its slight jerkiness, the Bayes filter was very effective.</p>
+        <img src="images/lab8/final_plot.png" style="width:1000px;height:600px;display:block;margin: 0 auto;">  
+        <p>Below I’ve also copied the output from running the Jupyter notebook. The aforementioned “jerkiness” can be seen in instances where the position error after the update step was greater than around 0.2 (i.e. at update step 17 the position error is (0.213, 0.205, -10.253)). Overall, however, the error after updating the belief probabilities is never more than 0.25.
+        </p>
+        <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="border: 1px solid #FF0000">----------------- 0 -----------------</span>
+        <span style="border: 1px solid #FF0000"> | Resetting Robot pose</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (11, 9, 7)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 9, 9) with prob =  0.5583522</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.311, 0.005, -32.345)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (11, 9, 7)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (10, 10, 7) with prob =  0.9877671</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.00031077934799717064</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.389, -0.095, -22.345)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (0.100, 0.100, -30.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.289, -0.195, 7.655)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 1 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (13, 7, 8)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (10, 9, 9) with prob =  0.5950288</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.572, -0.345, -15.157)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (13, 7, 8)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (12, 7, 8) with prob =  0.9998466</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.004718907561779862</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.672, -0.445, -5.157)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (0.500, -0.500, -10.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.172, 0.055, 4.843)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 2 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (14, 7, 9)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.271, 0.028, -6.906)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (14, 7, 9)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (12, 6, 7) with prob =  0.9984152</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.0010815797519005642</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.971, -0.472, 3.094)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (0.500, -0.700, -30.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.471, 0.228, 33.094)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 3 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (16, 7, 11)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.630, 0.048, 30.909)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (16, 7, 11)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (15, 6, 10) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.16791969845702853</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (1.330, -0.452, 40.909)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (1.100, -0.700, 30.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.230, 0.248, 10.909)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 4 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (17, 8, 14)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.847, 0.255, 91.070)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (17, 8, 14)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (16, 6, 13) with prob =  1.0</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.07602601151963728</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (1.547, -0.245, 101.070)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (1.300, -0.700, 90.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.247, 0.455, 11.070)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 5 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (17, 11, 14)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.751, 0.746, 91.070)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (17, 11, 14)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (16, 10, 13) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.5757767336375661</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (1.451, 0.246, 101.070)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (1.300, 0.100, 90.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.151, 0.146, 11.070)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 6 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (17, 13, 14)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.733, 1.166, 99.664)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (17, 13, 14)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (16, 13, 14) with prob =  0.9999901</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.21082399540482555</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (1.433, 0.666, 112.664)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (1.300, 0.700, 110.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.133, -0.034, 2.664)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 7 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (16, 15, 14)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.687, 1.643, 102.664)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (16, 15, 14)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (15, 16, 15) with prob =  0.8718900</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.6755749674404652</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (1.387, 1.143, 112.664)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (1.100, 1.300, 130.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.287, -0.157, -17.336)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 8 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (16, 15, 17)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.687, 1.643, 159.960)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (16, 15, 17)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (16, 15, 17) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.00012721469551803922</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (1.387, 1.143, 169.960)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (1.300, 1.100, 170.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.087, 0.043, -0.040)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 9 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (15, 16, 17)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (13, 7, 9) with prob =  0.9508565</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.362, 1.701, 161.106)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (15, 16, 17)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (15, 15, 17) with prob =  1.0</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.27556274671947023</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (1.062, 1.201, 174.106)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (1.100, 1.100, 170.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (-0.038, 0.101, 4.106)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 10 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (13, 16, 17)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (14, 15, 0) with prob =  1.0129776</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.166, 0.135, 340.668)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (13, 16, 17)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (13, 16, 17) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.9932016932248289</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.734, 1.235, 170.668)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (0.700, 1.300, 170.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.034, -0.065, 0.668)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 11 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (12, 16, 17)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.040, -0.013, -5.062)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (12, 16, 17)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (11, 16, 17) with prob =  0.9667798</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.9563612990597393</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.540, 1.287, 164.938)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (0.300, 1.300, 170.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.240, -0.013, -5.062)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 12 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (10, 17, 17)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.394, 0.104, -5.062)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (10, 17, 17)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (11, 17, 16) with prob =  1.0</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.2101085870898386</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.106, 1.404, 161.938)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (0.300, 1.500, 150.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (-0.194, -0.096, 11.938)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 13 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (10, 17, 17)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.442, 0.119, -2.332)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (10, 17, 17)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (10, 16, 17) with prob =  0.7517761</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.9752629702967919</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.058, 1.419, 170.668)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (0.100, 1.300, 170.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (-0.042, 0.119, 0.668)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 14 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (8, 17, 17)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.886, 0.192, 0.668)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (8, 17, 17)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (8, 17, 17) with prob =  1.0</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  1.0506893633978915</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.386, 1.492, 170.668)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.300, 1.500, 170.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (-0.086, -0.008, 0.668)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 15 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (8, 17, 2)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.886, 0.192, -290.577)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (8, 17, 3)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (8, 16, 2) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.004818959170515296</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.386, 1.492, -117.577)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.300, 1.300, -130.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (-0.086, 0.192, 12.423)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 16 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (7, 16, 3)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.941, 0.000, -276.118)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (7, 16, 3)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (7, 15, 3) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.5081943980157538</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.441, 1.300, -106.118)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.500, 1.100, -110.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.059, 0.200, 3.882)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 17 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (7, 15, 3)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-0.987, -0.195, -273.253)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (7, 15, 3)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (6, 14, 4) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.05161093362724171</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.487, 1.105, -100.253)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.700, 0.900, -90.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.213, 0.205, -10.253)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 18 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (7, 14, 3)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-1.041, -0.490, -271.399)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (7, 14, 3)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (6, 12, 4) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.920683121127736</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.541, 0.810, -101.399)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.700, 0.500, -90.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.159, 0.310, -11.399)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 19 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (7, 12, 3)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-1.100, -0.784, -272.545)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (7, 12, 3)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (6, 10, 4) with prob =  0.9999904</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.6397860191687885</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.600, 0.516, -102.545)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.700, 0.100, -90.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.100, 0.416, -12.545)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 20 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (6, 12, 4)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (12, 16, 17) with prob =  1.5030945</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (-1.116, -0.883, -263.378)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (6, 12, 4)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (6, 12, 4) with prob =  0.9961477</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.920683121127736</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.616, 0.417, -90.378)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.700, 0.500, -90.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.084, -0.083, -0.378)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 21 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (6, 10, 4)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (6, 11, 4) with prob =  1.8852285</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.082, -0.183, -0.378)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (6, 10, 4)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (6, 10, 4) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  1.5411483794694711</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.618, 0.117, -87.378)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.700, 0.100, -90.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.082, 0.017, 2.622)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 22 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (7, 8, 6)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (6, 11, 4) with prob =  1.8852285</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.218, -0.559, 37.000)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (7, 8, 6)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (7, 8, 6) with prob =  0.9999999</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  1.0651578813436664</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.482, -0.259, -53.000)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.500, -0.300, -50.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.018, 0.041, -3.000)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 23 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (8, 8, 9)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (6, 11, 4) with prob =  1.8852285</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.416, -0.584, 94.296)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (8, 8, 9)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (7, 8, 9) with prob =  1.0</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.6407468217156944</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.284, -0.284, 4.296)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.500, -0.300, 10.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.216, 0.016, -5.704)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 24 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (9, 9, 10)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (6, 11, 4) with prob =  1.8852285</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.626, -0.448, 117.214)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (9, 9, 10)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (9, 8, 10) with prob =  1.0</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.3928504488387687</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (-0.074, -0.148, 21.214)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.100, -0.300, 30.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.026, 0.152, -8.786)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+
+
+        <span style="border: 1px solid #FF0000">----------------- 25 -----------------</span>
+
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index            :  (10, 10, 10)</span>
+        <span style="border: 1px solid #FF0000">Prior Bel index     :  (6, 11, 4) with prob =  1.8852285</span>
+        <span style="border: 1px solid #FF0000">POS ERROR      : (0.778, -0.249, 125.538)</span>
+        <span style="border: 1px solid #FF0000">---------- PREDICTION STATS -----------</span>
+        <span style="border: 1px solid #FF0000"> | Executing Observation Loop at: 30 deg/s</span>
+
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">GT index      :  (10, 10, 10)</span>
+        <span style="border: 1px solid #FF0000">Bel index     :  (8, 10, 11) with prob =  0.9869102</span>
+        <span style="border: 1px solid #FF0000">Bel_bar prob at index =  0.7490538758360002</span>
+
+        <span style="border: 1px solid #FF0000">GT     : (0.078, 0.051, 35.538)</span>
+        <span style="border: 1px solid #FF0000">Belief   : (-0.300, 0.100, 50.000)</span>
+        <span style="border: 1px solid #FF0000">POS ERROR : (0.378, -0.049, -14.462)</span>
+        <span style="border: 1px solid #FF0000">---------- UPDATE STATS -----------</span>
+        <span style="border: 1px solid #FF0000">-------------------------------------</span>
+        </pre></div>
+
+        <p>Restarting the kernel and running all of the cells in the Jupyter notebook was a common occurrence for my filter to be able to simulate accurately between runs. There were multiple times where the program would work well once and I’d run it again to get consistent results (and a screen recording to prove it) only for the plotting to jump to the wrong corner of the environment or for the plotter to stop responding to specifically plotting belief. No matter what, killing and restarting the plotter didn’t fix anything and individually running the cell with my functions (as that was the only cell to ever be changed) didn’t fix this bug. Although it was a pain, I accepted that restarting the kernel was the best solution.
+        </p>
+
+      </div>
+		</div>
+	</section>
+
+	<!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+	<footer class="ftco-footer ftco-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 text-center">
+					
+					<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+						<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+					</div>
+				</div>
+			</div>
+		</footer>
+		
+		
+
+		<!-- loader -->
+		<div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery-migrate-3.0.1.min.js"></script>
+		<script src="js/popper.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>
+		<script src="js/jquery.waypoints.min.js"></script>
+		<script src="js/jquery.stellar.min.js"></script>
+		<script src="js/owl.carousel.min.js"></script>
+		<script src="js/jquery.magnific-popup.min.js"></script>
+		<script src="js/jquery.animateNumber.min.js"></script>
+		<script src="js/scrollax.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+		<script src="js/google-map.js"></script>
+		<script src="js/main.js"></script>
+		
+	</body>
+	</html>
