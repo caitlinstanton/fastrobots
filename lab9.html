@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>ECE 4960 Fast Robots</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="css/animate.css">
+
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+        aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="oi oi-menu"></span> Menu
+      </button>
+
+      <div class="collapse navbar-collapse" id="ftco-nav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+          <!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+          <!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- END nav -->
+
+  <section class="hero-wrap degree-right js-fullheight">
+    <div class="home-slider js-fullheight owl-carousel">
+      <div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+        <div class="overlay"></div>
+        <div class="container">
+          <div class="row no-gutters slider-text js-fullheight align-items-center">
+            <div class="col-md-12 ftco-animate">
+              <div class="text">
+                <h1 class="mb-4">Lab 9</h1>
+                <p>Localization on the real robot</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ftco-section ftco-portfolio bg-light">
+    <div class="row justify-content-center no-gutters">
+      <div class="col-md-8 heading-section ftco-animate mb-5">
+        <h2 class="mb-2 text-center">Objective</h2>
+        <p>After defining a map of our physical environment in lab 7, this lab is meant to localize the robot within
+          that map. This utilizes the Bluetooth connection from lab 2, the PID loop from lab 6, and the mapping from lab
+          7.
+        </p>
+        <h2 class="mb-2 text-center">Offline Localization</h2>
+        <p>During lab 6, Klaus was having a tremendous amount of difficulty performing a PID loop due to excessive
+          friction on his wheels. The only place he was able to spin freely was on a wooden chair, which was no good for
+          the mapping needed for lab 7. For this reason, the readings in lab 7 were acquired by manually rotating Klaus
+          as he gathered sensor data to send over Bluetooth. Though this would’ve been a viable option for this lab, I
+          preferred a hands-off approach and took up the suggestion to cover his wheels in Scotch tape. Surprisingly
+          this worked, and I was able to produce a relatively smooth axis rotation.
+        </p>
+        <p>With this loop in mind, I changed the setpoint from 50 to 30 so as to slow down the rotation and get 18
+          reliable readings (one for every 20 degree increment).</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">yaw_g = yaw_g+myICM.gyrZ()*dt;
+        
+          Input    = myICM.gyrZ();
+          Setpoint = 30;
+                  
+          myPID.Compute(); <span style="font-style: italic">//compute Output for motors</span>
+          <span style="font-weight: bold">if</span>(Output&gt;90) motorVal = 90;
+          <span style="font-style: italic">//if (Output&lt;50) motorVal = 100;</span>
+          <span style="font-weight: bold">else</span> motorVal = Output;
+
+          myMotorDriver.setDrive( 1, 1, motorVal); 
+          myMotorDriver.setDrive( 0, 0, motorVal);
+          </pre>
+        </div>
+
+        <p>In the virtual environment, I took the start and end points of my map from lab 7 to plot the simulated
+          environment. Additional bounding lines needed to be added or else the error “NoneType object is not iterable”
+          would be thrown.
+        </p>
+
+        <img src="images/lab9/none_type.png" style="display:block;margin: 0 auto;">
+        <br>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic"># Start points for each line segment describing the map</span>
+          start_points = np.array([[0,0],
+          [5,0],
+          [5,5],
+          [0,5],
+          [0,0],
+          [0,1],
+          [1,1],
+          [1,1.5],
+          [0,1.5],
+          [0,3.5],
+          [2,3.5],
+          [2,2.5],
+          [4.25,2.5],
+          [4.25,1.5],
+          [2.5,0.5]])
+
+          <span style="font-style: italic"># End points for each line segment describing the map\n&quot;,</span>
+          end_points = np.array([ [5,0],
+          [5,5],
+          [0,5],
+          [0,0],
+          [0,1],
+          [1,1],
+          [1,1.5],
+          [0,1.5],
+          [0,3.5],
+          [2,3.5],
+          [2,2.5],
+          [4.25,2.5],
+          [4.25,1.5],
+          [2.5,0.5],
+          [0,0]])
+          </pre>
+        </div>
+
+        <p>Initializing the Mapper also required understanding the number and size of the cells used to create the map.
+          Since the area was to be no more than a 4m by 4m space, I scaled down my coordinates by a factor of 2 so the
+          range in x and y values was between 0 and 5, whereas before they went from 0 to 10. That meant that the min
+          and max values for x and y had to be changed accordingly, as well as max_cells and ray_length. ray_length
+          specifically had to be a value longer than the maximum distance between two points on the map, which in the
+          case of my 5x5 bounding box was around 7 (the approximate hypotenuse).</p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic"># Requires a RealRobot object as input</span>
+          mapper = Mapper(min_x=0, max_x=5, min_y=0, max_y=5, min_a=-180, max_a=180,
+          cell_size_x=0.2, cell_size_y=0.2, cell_size_a=20,
+          max_cells_x=25, max_cells_y=25, max_cells_a=18,
+          ray_length=7, lines=[start_points, end_points], obs_per_cell=18, 
+          robot=robot)
+          </pre>
+        </div>
+
+        <p>From the 18 data points I took the readings from the time of flight sensor and divided them by 1000, since
+          the outputs were in millimeters but the virtual environment was in meters. This was saved as a numpy array in
+          loc.obs_range_data instead of using the function loc.get_observation_data() since that relied on a connection
+          with the physical robot. Calling one update_step() would then plot the belief of the position of the robot
+          within the plotter, along with the measured ground truth pose (using a ruler). Below is the code used to plot
+          the belief and ground truth, specifically at coordinate pair (0, 3.5).
+        </p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic"># Reset Plots</span>
+          robot.reset()
+          loc.plotter.reset_plot()
+
+          <span style="font-style: italic"># Init Uniform Belief</span>
+          loc.init_pose()
+
+          <span style="font-style: italic"># Get Observation Data by executing a 360 degree rotation motion</span>
+          <span style="font-style: italic">#loc.get_observation_data()</span>
+          loc.obs_range_data = np.array([0.219,0.222,0.251,0.293,0.346,0.335,0.32,0.239,0.262,0.309,0.492,0.439,0.446,0.412,0.267,0.224,0.224,0.317,0.289])
+          <span style="font-style: italic"># Run Update Step</span>
+          loc.update_step()
+          loc.print_update_stats(plot_data=<span style="font-weight: bold">True</span>)
+
+          <span style="font-style: italic"># Plot Odom and GT</span>
+          <span style="font-style: italic">#loc.plotter.plot_point(current_odom[0], current_odom[1], ODOM)</span>
+          loc.plotter.plot_point(0,3.5,GT)
+          </pre>
+        </div>
+
+        <p>I ran this procedure for multiple points, and with multiple trials for a few, and recognized that all of my
+          sensor data pinpointed the robot to be within an obstacle. I chalk this up to unreliable sensor data, as the
+          robot was spinning faster than in lab 7 due to the PID loop, and even then the mapping wasn’t quite accurate.
+          I plan to recalibrate the PID loop and sensors in order to get better data.
+        </p>
+
+        <img src="images/lab9/(0,0).png" style="display:block;margin: 0 auto;">
+        <img src="images/lab9/(0,0)_2.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;">Plots for (0,0)</p>
+        <img src="images/lab9/(2,1.5).png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;">Plot for (2,1.5)</p>
+        <img src="images/lab9/(2,3.5).png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;">Plot for (2,3.5)</p>
+        <img src="images/lab9/(3.5,0).png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;">Plot for (3.5,0)</p>
+
+        <h2 class="mb-2 text-center">Online Localization</h2>
+        <p>Online localization means receiving real-time data from Klaus as he moves around the physical environment
+          made for him. A critical subtask for this is establishing a Bluetooth connection from the robot to the VM, the
+          latter of which is then able to put that data through a Bayes filter for predictions. Unfortunately, previous
+          labs saw me run any Bluetooth connection code from my Mac host OS, so this issue needed to be debugged
+          immediately.
+        </p>
+
+        <p>An immediate red flag was the cached address within settings.py, the MAC address of the robot to be connected
+          to using the Bluetooth USB. My original cached address, which was able to connect on my host OS, was
+          “0EEEB402-2AC5-4904-BAFA-925974A4CBA1”, distinctly not a MAC address. This may have been okay on my Mac due to
+          its established Bluetooth protocols, but Linux explicitly required a MAC address. lsusb and hciconfig showed
+          that the USB was connected and running. Powering on and turning scan on within bluetoothctl displayed the
+          various devices accessible via Bluetooth. A few weren’t named and I guess and checked by running main.py to
+          see if I could connect to them.
+        </p>
+
+        <img src="images/lab9/post restart hci0.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab9/post restart hci1.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;">Top: terminal printout when adapter was set to 'hci0'; bottom: terminal printout
+          when adapter was set to 'hci1'</p>
+
+        <p>When using hci0 there was an “Operation in progress” error so I ran sudo service bluetooth restart and
+          changed the adapter in settings.py to hci1. The following screenshot was taken after a reliable Bluetooth
+          connection within the VM was possible, showing myRobot with the correct MAC address (66:77:88:23:BB:EF).
+        </p>
+
+        <img src="images/lab9/devices.png" style="display:block;margin: 0 auto;">
+
+        <p>I wrote up the following code within main.py to establish a robot instance for the Bluetooth connection and
+          set up the necessary functionality to send and receive messages over Bluetooth.
+        </p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic">#!/usr/bin/env python3</span>
+        <span style="font-weight: bold">import</span> <span style="font-weight: bold">asyncio</span>
+        <span style="font-weight: bold">from</span> <span style="font-weight: bold">bleak</span> <span style="font-weight: bold">import</span> discover, BleakClient
+        <span style="font-weight: bold">import</span> <span style="font-weight: bold">time</span>
+        <span style="font-weight: bold">from</span> <span style="font-weight: bold">constants</span> <span style="font-weight: bold">import</span> Descriptors, Commands, getCommandName
+        <span style="font-weight: bold">from</span> <span style="font-weight: bold">ece4960robot</span> <span style="font-weight: bold">import</span> Robot
+        <span style="font-weight: bold">from</span> <span style="font-weight: bold">settings</span> <span style="font-weight: bold">import</span> Settings
+        <span style="font-weight: bold">from</span> <span style="font-weight: bold">struct</span> <span style="font-weight: bold">import</span> unpack, calcsize
+        
+        
+        <span style="font-weight: bold">class</span> <span style="font-weight: bold">RobotHolder</span>:
+          <span style="font-weight: bold">def</span> __init__(self):
+              client = BleakClient(theRobot_bt.address,
+                                    loop=loop,
+                                    device=Settings[<span style="font-style: italic">&quot;adapter&quot;</span>])
+              <span style="font-style: italic"># if (await client.is_connected()):</span>
+              <span style="font-style: italic">#    print(&quot;Robot connected!&quot;)</span>
+              <span style="font-style: italic"># srv = await client.get_services()</span>
+              <span style="font-style: italic"># print(srv)</span>
+              client.is_connected()
+              self.theRobot = Robot(client, bleak=<span style="font-weight: bold">True</span>)
+              client.start_notify(Descriptors[<span style="font-style: italic">&quot;TX_CHAR_UUID&quot;</span>].value, simpleHandler)
+        
+          <span style="font-weight: bold">def</span> setter(self, toSet):
+              self.instanceVariable = toSet
+        
+          <span style="font-weight: bold">def</span> getter(self):
+              <span style="font-weight: bold">return</span> self.theRobot
+        
+        
+        async <span style="font-weight: bold">def</span> bluetooth_get_pose():
+          print(<span style="font-style: italic">&#39;Robot is moving&#39;</span>)
+          await asyncio.sleep(3)
+          print(<span style="font-style: italic">&#39;Robot has stopped&#39;</span>)
+          <span style="font-weight: bold">return</span> [0, 0, 30]  <span style="font-style: italic"># dummy data</span>
+        
+        
+        async <span style="font-weight: bold">def</span> bluetooth_perform_observation_loop():
+          print(<span style="font-style: italic">&#39;Executing Rotation Behavaior&#39;</span>)
+          await asyncio.sleep(3)
+          print(<span style="font-style: italic">&#39;Done with Rotation Behavior&#39;</span>)
+          <span style="font-weight: bold">return</span> [0.3, 0.2, 0.5]  <span style="font-style: italic"># dummy data</span>
+        
+        
+        async <span style="font-weight: bold">def</span> getRobot():
+          devices = await discover(device=Settings[<span style="font-style: italic">&quot;adapter&quot;</span>], timeout=2)
+          <span style="font-style: italic"># for d in devices:</span>
+          <span style="font-style: italic">#    print(d.name)</span>
+          p_robot = [d <span style="font-weight: bold">for</span> d <span style="font-weight: bold">in</span> devices <span style="font-weight: bold">if</span> d.name == <span style="font-style: italic">&quot;MyRobot&quot;</span>]
+          <span style="font-weight: bold">if</span> (len(p_robot) &gt; 0):
+              <span style="font-style: italic">#    print(p_robot[0].address)</span>
+              <span style="font-weight: bold">return</span> p_robot[0]
+          <span style="font-weight: bold">else</span>:
+              <span style="font-weight: bold">return</span> <span style="font-weight: bold">None</span>
+        
+        
+        async <span style="font-weight: bold">def</span> robotTest(loop):
+        
+          <span style="font-style: italic"># Handle is the TX characteristic UUID; does not change in our simple case.</span>
+          <span style="font-style: italic"># Robot sends &quot;enq&quot; every 2 seconds to keep the connection &quot;fresh&quot;</span>
+          <span style="font-style: italic"># Otherwise, it&#39;s a struct of the form:</span>
+          <span style="font-style: italic"># bytes(type + length + data)</span>
+          <span style="font-style: italic"># This struct shouldn&#39;t be more than 99 bytes long.</span>
+        
+          <span style="font-weight: bold">def</span> simpleHandler(handle, value):
+              <span style="font-weight: bold">global</span> time  <span style="font-style: italic"># This is apparently needed.</span>
+              <span style="font-weight: bold">if</span> (value == <span style="font-style: italic">&quot;enq&quot;</span>.encode()):
+                  <span style="font-weight: bold">pass</span>
+              <span style="font-weight: bold">else</span>:
+                  fmtstring = <span style="font-style: italic">&quot;BB&quot;</span> + str(len(value) - 2) + <span style="font-style: italic">&quot;s&quot;</span>
+                  code, length, data = unpack(fmtstring, value)
+                  <span style="font-style: italic">&#39;&#39;&#39;</span>
+        <span style="font-style: italic">           Python doesn&#39;t have a switch statement, nor easily compatible</span>
+        <span style="font-style: italic">           enum support. This might be the easiest way to handle commands.</span>
+        <span style="font-style: italic">           &#39;&#39;&#39;</span>
+                  <span style="font-weight: bold">if</span> (Settings[<span style="font-style: italic">&quot;OutputRawData&quot;</span>]):
+                      print(
+                          f<span style="font-style: italic">&quot;Code: {getCommandName(code)} Length: {length} Data: {data}&quot;</span>
+                      )
+        
+                  <span style="font-style: italic"># Somewhat detach console output from Bluetooth handling.</span>
+                  <span style="font-weight: bold">if</span> (code == Commands.SER_TX.value):
+                      theRobot.pushMessage(str(data, encoding=<span style="font-style: italic">&quot;UTF-8&quot;</span>))
+        
+                  <span style="font-style: italic"># Example of unpacking a little-endian 32-bit float.</span>
+                  <span style="font-weight: bold">if</span> (code == Commands.GIVE_FLOAT.value):
+                      print(unpack(<span style="font-style: italic">&quot;&lt;f&quot;</span>, data))
+        
+                  <span style="font-style: italic"># Example of command-response.</span>
+                  <span style="font-weight: bold">if</span> (code == Commands.PONG.value):
+                      print(f<span style="font-style: italic">&quot;Got pong: round trip {time.time() - theRobot.now}&quot;</span>)
+                      <span style="font-weight: bold">if</span> (Settings[<span style="font-style: italic">&quot;pingLoop&quot;</span>]):
+                          loop.create_task(theRobot.ping())
+                          <span style="font-style: italic"># theRobot.newPing = True</span>
+        
+                  <span style="font-style: italic"># Unpack from an example stream that transmits a 2-byte and a</span>
+                  <span style="font-style: italic"># 4-byte integer as quickly as possible, both little-endian.</span>
+                  <span style="font-weight: bold">if</span> (code == Commands.BYTESTREAM_TX.value):
+                      print(unpack(<span style="font-style: italic">&quot;&lt;LiIfff&quot;</span>,
+                                    data))  <span style="font-style: italic">#unpacks 1 long, 2 chars and 2 floats</span>
+        
+          async <span style="font-weight: bold">def</span> checkMessages():
+              <span style="font-weight: bold">while</span> <span style="font-weight: bold">True</span>:
+                  <span style="font-weight: bold">if</span> (theRobot.availMessage()):
+                      print(f<span style="font-style: italic">&quot;BTDebug: {theRobot.getMessage()}&quot;</span>)
+                  await asyncio.sleep(0.1)
+        </pre>
+        </div>
+
+        <p>Within the Jupyter notebook environment lab9_real I first ran <code>from main import *</code> to bring in all
+          of the
+          variables and functions declared in main.py. In the next cell I ran:
+        </p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">loop = asyncio.get_event_loop()
+          loop.run_until_complete(robotTest(loop))
+          </pre>
+        </div>
+
+        <p>At one point this did establish a Bluetooth connection to Klaus, who then proceeded to send over sensor
+          readings that would normally be sent over during a PID loop. Unfortunately, after accidentally restarting the
+          kernel I keep getting the following error, which theoretically wouldn’t be a problem if there was a
+          connection, but there isn’t.
+        </p>
+
+        <img src="images/lab9/event_loop.png" style="display:block;margin: 0 auto;">
+
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+  <footer class="ftco-footer ftco-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+
+          <p>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;
+            <script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with
+            <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com"
+              target="_blank">Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
+      <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+      <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
+        stroke="#F96D00" /></svg></div>
+
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/scrollax.min.js"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="js/google-map.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
