@@ -79,6 +79,12 @@
           preferred a hands-off approach and took up the suggestion to cover his wheels in Scotch tape. Surprisingly
           this worked, and I was able to produce a relatively smooth axis rotation.
         </p>
+
+        <video controls="controls" src="videos/lab9/PID.mov"
+          style="width:500px;height:300px; display:block;margin: 0 auto;">
+          Your browser does not support the HTML5 Video element.
+        </video>
+
         <p>With this loop in mind, I changed the setpoint from 50 to 30 so as to slow down the rotation and get 18
           reliable readings (one for every 20 degree increment).</p>
         <!-- HTML generated using hilite.me -->
@@ -372,7 +378,14 @@
         </div>
 
         <p>At one point this did establish a Bluetooth connection to Klaus, who then proceeded to send over sensor
-          readings that would normally be sent over during a PID loop. Unfortunately, after accidentally restarting the
+          readings that would normally be sent over during a PID loop.</p>
+
+        <video controls="controls" src="videos/lab9/VM_bluetooth.MOV"
+          style="width:500px;height:300px; display:block;margin: 0 auto;">
+          Your browser does not support the HTML5 Video element.
+        </video>
+
+        <p>Unfortunately, after accidentally restarting the
           kernel I keep getting the following error, which theoretically wouldn’t be a problem if there was a
           connection, but there isn’t.
         </p>
