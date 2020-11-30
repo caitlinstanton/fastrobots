@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>ECE 4960 Fast Robots</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="css/animate.css">
+
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+        aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="oi oi-menu"></span> Menu
+      </button>
+
+      <div class="collapse navbar-collapse" id="ftco-nav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+          <!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+          <!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- END nav -->
+
+  <section class="hero-wrap degree-right js-fullheight">
+    <div class="home-slider js-fullheight owl-carousel">
+      <div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+        <div class="overlay"></div>
+        <div class="container">
+          <div class="row no-gutters slider-text js-fullheight align-items-center">
+            <div class="col-md-12 ftco-animate">
+              <div class="text">
+                <h1 class="mb-4">Lab 10</h1>
+                <p>Path Planning and Execution</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ftco-section ftco-portfolio bg-light">
+    <div class="row justify-content-center no-gutters">
+      <div class="col-md-8 heading-section ftco-animate mb-5">
+        <h2 class="mb-2 text-center">Objective</h2>
+        <p>Given our previous experience with localization in the physical and virtual space, this lab is meant to
+          further expand upon this in order to allow the robot to move from one point to another seamlessly.
+          Localization was not the only potential mode with which to accomplish this task, however, as the following
+          concepts had also been touched upon during the semester so far:
+        </p>
+        <ol>
+          <li>Open loop control</li>
+          <li>Obstacle avoidance</li>
+          <li>PID control</li>
+          <li>Proximity, TOF, accelerometer, gyroscope, magnetometer readings</li>
+          <li>Local path planning (e.g. Bug 0-2 algorithms)</li>
+          <li>Graph search algorithms</li>
+        </ol>
+        <h2 class="mb-2 text-center">Virtual</h2>
+        <p>I used code from Richardos Drakoulis (located in <a
+            href="https://github.com/richardos/occupancy-grid-a-star">this Github repository</a>) for my A-Star
+          algorithm within a 2D occupancy map. I also spoke with Katie Bradford and Greg Kaiser about the function
+          needed to move the virtual robot from point to point, specifically called <code>move_to_next</code>.
+        </p>
+        <p>To define the walls of the environment within the simulation, an occupancy grid map was built. Originally, I
+          intended to create this dynamically from the lines plotted on the plotter by taking a screenshot of the
+          application and passing it through a function from Richardos Drakoulis that would accept a PNG image and
+          convert it to an OccupancyGridMap object using numpy.array functions, as shown in the code below. However, I
+          wasn’t able to configure the screenshot area to intelligently take a screenshot of only the environment (i.e.
+          not the plotter buttons) and the image itself didn’t pick up too well on the lines within the environment.</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">import</span> <span style="font-weight: bold">subprocess</span>
+            subprocess.run([<span style="font-style: italic">&quot;/bin/bash&quot;</span>,<span style="font-style: italic">&quot;-c&quot;</span>, <span style="font-style: italic">&quot;wmctrl -a &#39;Plotter&#39;&quot;</span>])
+            subprocess.run([<span style="font-style: italic">&quot;/bin/bash&quot;</span>,<span style="font-style: italic">&quot;-c&quot;</span>,<span style="font-style: italic">&quot;scrot -d 4 -u -quality 100 map.png&quot;</span>])
+            gmap = OccupancyGridMap.from_png(<span style="font-style: italic">&#39;map.png&#39;</span>, 1)
+            gmap.plot()
+          </pre>
+        </div>
+        <p>Instead I used a manually-created 2D array of 1s and 0s, where a 1 indicates the presence of an obstacle and
+          0 indicates otherwise. This resulted in the following grid definition:
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">grid =  [ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,
+          1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,
+          1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,
+          1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+          1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        </pre>
+        </div>
+        <p>To work within the given coordinate generation program from <code>lab10_generate_query.ipynb</code>, which
+          generated
+          random coordinate pairs for the starting and ending points for the robot to travel between, the occupancy grid
+          had to be of size (17, 23). </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic"># Instantiate the class PlannerQuery</span>
+          pq = PlannerQuery(grid)
+                  
+          <span style="font-weight: bold">for</span> i <span style="font-weight: bold">in</span> range(0,10):
+              <span style="font-style: italic"># Generate a start and goal pair</span>
+              (start_node, goal_node) = pq.generate(plot=<span style="font-weight: bold">True</span>)
+              gmap = OccupancyGridMap.from_data(grid,1,1)
+              gmap.plot()
+              print(<span style="font-style: italic">&quot;-----------------&quot;</span>)
+              path, path_px = a_star(start_node, goal_node, gmap,movement=<span style="font-style: italic">&quot;4N&quot;</span>)
+          </pre>
+        </div>
+        <p>I chose the A-Star algorithm to find a possible path from <code>start_node</code> to <code>goal_node</code>.
+          It could work within four
+          or eight degree resolution, meaning that it could either look at the nodes in the surrounding four cardinal
+          directions (N, E, S, W) or the nodes in the four cardinal directions and four intermediate cardinal directions
+          (NE, SE, NW, SW). I opted for the four-degree algorithm in order to optimize runtime, since all degrees of
+          motion were looped over when calculating potential options for the next node. In addition to the occupancy
+          grid map, a 2D array was used to store the visited state of each location so as to prevent any repeats and
+          cycles in the path to the goal node.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">def</span> a_star(start_m, goal_m, gmap, movement=<span style="font-style: italic">&#39;8N&#39;</span>, occupancy_cost_factor=3):
+          <span style="font-style: italic">&quot;&quot;&quot;</span>
+          <span style="font-style: italic">   A* for 2D occupancy grid.</span>
+          <span style="font-style: italic"> </span>
+          <span style="font-style: italic">   :param start_m: start node (x, y) in meters</span>
+          <span style="font-style: italic">   :param goal_m: goal node (x, y) in meters</span>
+          <span style="font-style: italic">   :param gmap: the grid map</span>
+          <span style="font-style: italic">   :param movement: select between 4-connectivity (&#39;4N&#39;) and 8-connectivity (&#39;8N&#39;, default)</span>
+          <span style="font-style: italic">   :param occupancy_cost_factor: a number the will be multiplied by the occupancy probability</span>
+          <span style="font-style: italic">       of a grid map cell to give the additional movement cost to this cell (default: 3).</span>
+          <span style="font-style: italic"> </span>
+          <span style="font-style: italic">   :return: a tuple that contains: (the resulting path in meters, the resulting path in data array indices)</span>
+          <span style="font-style: italic">   &quot;&quot;&quot;</span>
+              <span style="font-style: italic"># get array indices of start and goal</span>
+              start = gmap.get_index_from_coordinates(start_m[0], start_m[1])
+              goal = gmap.get_index_from_coordinates(goal_m[0], goal_m[1])
+            
+              <span style="font-style: italic"># check if start and goal nodes correspond to free spaces</span>
+              <span style="font-weight: bold">if</span> gmap.is_occupied_idx(start):
+                  <span style="font-weight: bold">raise</span> <span style="font-weight: bold">Exception</span>(<span style="font-style: italic">&#39;Start node is not traversable&#39;</span>)
+            
+              <span style="font-weight: bold">if</span> gmap.is_occupied_idx(goal):
+                  <span style="font-weight: bold">raise</span> <span style="font-weight: bold">Exception</span>(<span style="font-style: italic">&#39;Goal node is not traversable&#39;</span>)
+            
+              <span style="font-style: italic"># add start node to front</span>
+              <span style="font-style: italic"># front is a list of (total estimated cost to goal, total cost from start to node, node, previous node)</span>
+              start_node_cost = 0
+              start_node_estimated_cost_to_goal = dist2d(start, goal) + start_node_cost
+              front = [(start_node_estimated_cost_to_goal, start_node_cost, start, <span style="font-weight: bold">None</span>)]
+            
+              <span style="font-style: italic"># use a dictionary to remember where we came from in order to reconstruct the path later on</span>
+              came_from = {}
+            
+              <span style="font-style: italic"># get possible movements</span>
+              <span style="font-weight: bold">if</span> movement == <span style="font-style: italic">&#39;4N&#39;</span>:
+                  movements = _get_movements_4n()
+              <span style="font-weight: bold">elif</span> movement == <span style="font-style: italic">&#39;8N&#39;</span>:
+                  movements = _get_movements_8n()
+              <span style="font-weight: bold">else</span>:
+                  <span style="font-weight: bold">raise</span> <span style="font-weight: bold">ValueError</span>(<span style="font-style: italic">&#39;Unknown movement&#39;</span>)
+            
+              <span style="font-style: italic"># while there are elements to investigate in our front.</span>
+              <span style="font-weight: bold">while</span> front:
+                  <span style="font-style: italic"># get smallest item and remove from front.</span>
+                  element = heappop(front)
+            
+                  <span style="font-style: italic"># if this has been visited already, skip it</span>
+                  total_cost, cost, pos, previous = element
+                  <span style="font-weight: bold">if</span> gmap.is_visited_idx(pos):
+                      <span style="font-weight: bold">continue</span>
+            
+                  <span style="font-style: italic"># now it has been visited, mark with cost</span>
+                  gmap.mark_visited_idx(pos)
+            
+                  <span style="font-style: italic"># set its previous node</span>
+                  came_from[pos] = previous
+            
+                  <span style="font-style: italic"># if the goal has been reached, we are done!</span>
+                  <span style="font-weight: bold">if</span> pos == goal:
+                      <span style="font-weight: bold">break</span>
+            
+                  <span style="font-style: italic"># check all neighbors</span>
+                  <span style="font-weight: bold">for</span> dx, dy, deltacost <span style="font-weight: bold">in</span> movements:
+                      <span style="font-style: italic"># determine new position</span>
+                      new_x = pos[0] + dx
+                      new_y = pos[1] + dy
+                      new_pos = (new_x, new_y)
+            
+                      <span style="font-style: italic"># check whether new position is inside the map</span>
+                      <span style="font-style: italic"># if not, skip node</span>
+                      <span style="font-weight: bold">if</span> <span style="font-weight: bold">not</span> gmap.is_inside_idx(new_pos):
+                          <span style="font-weight: bold">continue</span>
+            
+                      <span style="font-style: italic"># add node to front if it was not visited before and is not an obstacle</span>
+                      <span style="font-weight: bold">if</span> (<span style="font-weight: bold">not</span> gmap.is_visited_idx(new_pos)) <span style="font-weight: bold">and</span> (
+                              <span style="font-weight: bold">not</span> gmap.is_occupied_idx(new_pos)):
+                          potential_function_cost = gmap.get_data_idx(
+                              new_pos) * occupancy_cost_factor
+                          new_cost = cost + deltacost + potential_function_cost
+                          new_total_cost_to_goal = new_cost + dist2d(
+                              new_pos, goal) + potential_function_cost
+            
+                          heappush(front,
+                                  (new_total_cost_to_goal, new_cost, new_pos, pos))
+            
+              <span style="font-style: italic"># reconstruct path backwards (only if we reached the goal)</span>
+              path = []
+              path_idx = []
+              <span style="font-weight: bold">if</span> pos == goal:
+                  <span style="font-weight: bold">while</span> pos:
+                      path_idx.append(pos)
+                      <span style="font-style: italic"># transform array indices to meters</span>
+                      pos_m_x, pos_m_y = gmap.get_coordinates_from_index(pos[0], pos[1])
+                      path.append((pos_m_x, pos_m_y))
+                      pos = came_from[pos]
+            
+                  <span style="font-style: italic"># reverse so that path is from start to goal.</span>
+                  path.reverse()
+                  path_idx.reverse()
+            
+              <span style="font-weight: bold">return</span> path, path_idx
+          </pre>
+        </div>
+        <p>After confirming that the start and goal nodes are valid coordinates within the given occupancy map, the
+          A-Star algorithm calculates the cost of moving from one node to the next. An array called front holds all of
+          the proposed nodes and their costs. The cost here is equal to the sum of the cost accumulated by the previous
+          node in the chain, the Euclidean distance between the previous and proposed node, and the occupancy state of
+          the proposed node multiplied by an occupancy factor. The cost accumulates across the nodes in the chain
+          because there may be multiple paths to the goal node but A-Star strives to find that with the lowest cost.
+          Though the movements of the virtual robot are constrained to perpendicular motion, the Euclidean distance is a
+          consistently enough judge of the distance between two points (especially considering that the proposed node is
+          adjacent to the previous node due to the four/eight degrees of freedom). Lastly, the product of the occupancy
+          state by the occupancy factor (in this case, 3) is to emphasize to the algorithm that an occupied node is not
+          one to be travelled to—the occupancy factor needs to be a large enough number to discourage any traversal to
+          this proposed node.
+        </p>
+        <p>While this front array contains nodes, there are more options to look into. If it hasn’t been visited before
+          and/or has an obstacle, the node at the front of the array is popped to mark it visited. It’s then added to
+          another array came_from to keep track of the nodes on the path to the goal node. Four or eight more nodes are
+          added to front with their calculated costs so as to expand the front of potential motion for the algorithm to
+          continue with. Once the cost of a proposed node is calculated, it along with the proposed node’s coordinates
+          and the previous node’s coordinates are appended to an array on the condition that they have not been visited
+          previously and aren’t occupied by an obstacle.
+        </p>
+        <p>Once that loop has finished, the last node is checked against the coordinates of the goal node. If there’s a
+          match, the path of nodes from start to end is generated by reversing came_from. One array is in meters (path)
+          while the other is in the map’s coordinate system (path_idx).
+        </p>
+        <p>Now that A-Star has been called, it’s time to plot the results. If the array outputted by a_star isn’t empty,
+          then the coordinates of each node within it have to be mapped to both the plotter and the simulation:
+          ((i[1])*0.152,(17-i[0])*0.152, 0). This took a little finagling to determine since the occupancy grid map’s
+          indexes worked with a scale of whole integers while the cell size of the plotter and simulation was 0.152.
+          Additionally, the origin of the Python plots was in the top left corner, rather than the bottom left corner as
+          with the plotter and simulation.</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">if</span> path:
+                <span style="font-style: italic"># plot resulting path in pixels over the map</span>
+                <span style="font-style: italic">#plot_path(path_px)</span>
+                path_arr = np.array(path)
+                prevStep = (1,1,0)
+                <span style="font-style: italic">#nextStep = ((start_node[1])*0.152,(17-start_node[0])*0.152,0)</span>
+                <span style="font-style: italic">#move_to_next(prevStep,nextStep,robot)</span>
+                <span style="font-style: italic">#prevStep = nextStep</span>
+                <span style="font-weight: bold">for</span> i <span style="font-weight: bold">in</span> path_arr:
+                    graphStep = ((i[1])*0.152,(17-i[0])*0.152, 0)
+                    loc.plotter.plot_point(graphStep[0], graphStep[1],GT)
+                    
+                    nextStep = ((i[1])*0.152,(17-i[0])*0.152,0)
+                    move_to_next(prevStep,nextStep,robot)
+                    loc.plotter.plot_point(robot.get_gt_pose()[0], robot.get_gt_pose()[1], GT)
+                    loc.plotter.plot_point(robot.get_pose()[0], robot.get_pose()[1], ODOM)
+                    prevStep = nextStep
+                print(<span style="font-style: italic">&quot;MOVE FROM &quot;</span> + str(start_node) + <span style="font-style: italic">&quot; TO &quot;</span> + str(goal_node) + <span style="font-style: italic">&quot; COMPLETE!&quot;</span>)
+                robot.set_vel(0,0)
+                start_node_px = gmap.get_index_from_coordinates(start_node[0], start_node[1])
+                goal_node_px = gmap.get_index_from_coordinates(goal_node[0], goal_node[1])
+        
+                plt.plot(path_arr[:, 1], path_arr[:, 0], <span style="font-style: italic">&#39;yo&#39;</span>)
+                plt.plot(start_node_px[1], start_node_px[0], <span style="font-style: italic">&#39;ro&#39;</span>)
+                plt.plot(goal_node_px[1], goal_node_px[0], <span style="font-style: italic">&#39;go&#39;</span>)
+            <span style="font-weight: bold">else</span>:
+                print(<span style="font-style: italic">&#39;Goal is not reachable&#39;</span>)
+        
+                <span style="font-style: italic"># plot start and goal points over the map (in pixels)</span>
+                start_node_px = gmap.get_index_from_coordinates(start_node[0], start_node[1])
+                goal_node_px = gmap.get_index_from_coordinates(goal_node[0], goal_node[1])
+        
+                plt.plot(start_node_px[1], start_node_px[0], <span style="font-style: italic">&#39;ro&#39;</span>)
+                plt.plot(goal_node_px[1], goal_node_px[0], <span style="font-style: italic">&#39;go&#39;</span>)
+        
+            plt.show()
+        </pre>
+        </div>
+        <p>Below are the twenty plots drawn over the course of this script. Each pair corresponds to a starting and goal
+          point; the top plot shows those two points, and the bottom plot shows the two points and the nodes connecting
+          them via A-Star.
+        </p>
+        <img src="images/lab10/plot1.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot2.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot3.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot4.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot5.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot6.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot7.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot8.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot9.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab10/plot10.png" style="display:block;margin: 0 auto;">
+        <br>
+        <p>Translating to the virtual robot was a bit trickier. A-Star gave the coordinate pairs connecting the start
+          and goal points, which were fed into move_to_next. This function compared the integer indexes of the current
+          and proposed nodes in order to determine which direction the virtual robot had to move to reach the proposed
+          node. Considering the origin of A-Star’s grid map was different from the simulation, I had to check the ground
+          truth odometry data of the robot at virtual points to ensure X and Y were being decremented/incremented
+          accordingly. If the current position’s X coordinate was bigger than that of the proposed node, the robot had
+          to move to the left, and if it was smaller the robot had to move to the right. If the current position’s Y
+          coordinate was bigger than that of the proposed node, the robot had to move down, and if it was smaller the
+          robot had to move up.
+          Translating to the virtual robot was a bit trickier. A-Star gave the coordinate pairs connecting the start and
+          goal points, which were fed into move_to_next. This function compared the integer indexes of the current and
+          proposed nodes in order to determine which direction the virtual robot had to move to reach the proposed node.
+          Considering the origin of A-Star’s grid map was different from the simulation, I had to check the ground truth
+          odometry data of the robot at virtual points to ensure X and Y were being decremented/incremented accordingly.
+          If the current position’s X coordinate was bigger than that of the proposed node, the robot had to move to the
+          left, and if it was smaller the robot had to move to the right. If the current position’s Y coordinate was
+          bigger than that of the proposed node, the robot had to move down, and if it was smaller the robot had to move
+          up.
+        </p>
+        <p>It was important to factor in the robot’s orientation before making any linear motion, because left to a
+          robot pointing north means moving to west, while it means moving east to a robot pointing south. The best way
+          to determine the orientation was through the robot’s own ground truth data and the defined degrees of the
+          coordinate axes. North is -90 degrees and moves the robot down the simulation. West is 180 degrees and moves
+          the robot left. South is therefore 90 degrees and moves the robot up, and east is 0 degrees and moves the
+          robot to the right.
+        </p>
+        <p>Within each condition checking the current and proposed positions was a while loop that would keep the robot
+          spinning on its z axis until the desired angle of that cardinal movement was reached. The robot kept moving in
+          a linear direction until it had reached its proposed node. Due to the higher resolution of the simulation’s
+          ground truth data for x, y, and angle, these fields had to be rounded, otherwise the script would keep
+          toggling between motions, effectively circling its intended target but getting nowhere closer.
+        </p>
+        <img src="images/lab10/toggle.png" style="display:block;margin: 0 auto;">
+        <br>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">def</span> check_front(robot):
+          <span style="font-weight: bold">return</span> robot.get_laser_data() &lt; 0.2
+
+          <span style="font-weight: bold">def</span> move_to_next(currPos, nextPos, robot):
+              print(str(currPos) + <span style="font-style: italic">&quot; to &quot;</span> + str(nextPos))
+              <span style="font-style: italic">#while(round(robot.get_gt_pose()[0],2) != nextPos[0] and round(robot.get_gt_pose()[1],2) != nextPos[1]):</span>
+              print(robot.get_gt_pose())
+              <span style="font-weight: bold">if</span>(currPos[0]&gt;nextPos[0]): <span style="font-style: italic">#moving left</span>
+                  print(<span style="font-style: italic">&quot;moving left&quot;</span>)
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+                  nextAng = 180;
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[2]) != nextAng): <span style="font-style: italic">#wait till it gets to the right angle</span>
+                      robot.set_vel(0,0.1)
+                  <span style="font-style: italic">#print(&quot;@ 180&quot;)</span>
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[0],2) &gt; nextPos[0]): <span style="font-style: italic">#wait till it gets to the right distance</span>
+                      robot.set_vel(0.1,0)
+                  <span style="font-style: italic">#print(&quot;@ location&quot;)</span>
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+          
+              <span style="font-weight: bold">if</span>(currPos[0]&lt;nextPos[0]): <span style="font-style: italic">#moving right</span>
+                  print(<span style="font-style: italic">&quot;moving right&quot;</span>)
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+                  nextAng = 0;
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[2]) != nextAng): <span style="font-style: italic">#wait till it gets to the right angle</span>
+                      robot.set_vel(0,0.1)
+                  <span style="font-style: italic">#print(&quot;@ 0&quot;)</span>
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[0],2) &lt; nextPos[0]): <span style="font-style: italic">#wait till it gets to the right distance</span>
+                      robot.set_vel(0.1,0)
+                  <span style="font-style: italic">#print(&quot;@ location&quot;)</span>
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+          
+              <span style="font-weight: bold">if</span>(currPos[1]&gt;nextPos[1]): <span style="font-style: italic">#moving down</span>
+                  print(<span style="font-style: italic">&quot;moving down&quot;</span>)
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+                  nextAng = -90;
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[2]) != nextAng): <span style="font-style: italic">#wait till it gets to the right angle</span>
+                      robot.set_vel(0,0.1)
+                  <span style="font-style: italic">#print(&quot;@ -90&quot;)</span>
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[1],2) &gt; nextPos[1] <span style="font-weight: bold">and</span> (<span style="font-weight: bold">not</span> check_front(robot))): <span style="font-style: italic">#wait till it gets to the right distance</span>
+                      robot.set_vel(0.1,0)
+                  <span style="font-style: italic">#print(&quot;@ location&quot;)</span>
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+          
+              <span style="font-weight: bold">if</span>(currPos[1]&lt;nextPos[1]): <span style="font-style: italic">#moving up</span>
+                  print(<span style="font-style: italic">&quot;moving up&quot;</span>)
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+                  nextAng = 90;
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[2]) != nextAng): <span style="font-style: italic">#wait till it gets to the right angle</span>
+                      robot.set_vel(0,0.1)
+                  <span style="font-style: italic">#print(&quot;@ 90&quot;)</span>
+                  <span style="font-weight: bold">while</span>(round(robot.get_gt_pose()[1],2) &lt; nextPos[1] <span style="font-weight: bold">and</span> (<span style="font-weight: bold">not</span> check_front(robot))): <span style="font-style: italic">#wait till it gets to the right distance</span>
+                      robot.set_vel(0.1,0)
+                  <span style="font-style: italic">#print(&quot;@ location&quot;)</span>
+                  <span style="font-style: italic">#print(robot.get_gt_pose())</span>
+          
+              print(<span style="font-style: italic">&quot;DONE WITH STEP&quot;</span>)
+              robot.set_vel(0,0) 
+          </pre>
+        </div>
+        <p>I tried to speed up the process of checking data by increasing the angular velocity, but this resulted in the
+          robot needing to spin multiple times before its ground truth data could catch up and allow the robot to move
+          onto linear motion. I also tried to incorporate some sensing into the simulation by using the get_laser_data
+          to check if an obstacle was in the robot’s way while turning or moving forward. This wasn’t something I
+          incorporated into the final algorithm because it disrupted the motion given by A-Star—A-Star didn’t need to
+          take into account the size of the robot and how it can’t always have enough room to move perfectly against the
+          walls. For that reason, I deleted all of the walls from the simulation and did away with checking to see if
+          there were any obstacles in front of the robot. Though it meant it was a little harder to understand where in
+          the environment the virtual robot was, it made the robot’s job of moving from one point to the other much
+          easier. Below is a video showing the plotter and simulation while the Jupyter notebook is running. Note the
+          extreme difference between the ground truth and odometry data points in the plotter; I attribute this partly
+          to the lack of localization or Bayes Filter used in my script.
+        </p>
+        <h2 class="mb-2 text-center">Physical</h2>
+        <p>As proven in lab 6, 7, and 9, Klaus has some issues with sending Bluetooth commands and gathering sensor
+          data. The most recent discovery was that the time of flight sensor’s readings were capping out at around one
+          foot, despite being able to detect objects up to four meters away. For these reasons I knew it wouldn’t be
+          worth my time to attempt to reach a point using localization. Instead, I implemented the A-Star algorithm from
+          before, as well as a depth-first-search algorithm.
+        </p>
+        <p>Globally, I defined the occupancy grid map from before, the size of the map, and the default starting node’s
+          coordinates. A-Star required structs to not only track the coordinates of the node but also the cost
+          associated with reaching it, as well as the path array to add all of the nodes to. DFS only required a struct
+          where each node could be marked as visited or unvisited.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic">#define MAZE_X 17</span>
+            <span style="font-style: italic">#define MAZE_Y 23</span>
+
+            <span style="font-weight: bold">int</span> x = 4;
+            <span style="font-weight: bold">int</span> y = 1;
+            <span style="font-weight: bold">int</span> dir = 0;
+
+            <span style="font-weight: bold">int</span> goalX;
+            <span style="font-weight: bold">int</span> goalY;
+
+            <span style="font-weight: bold">enum</span> DIRECTION {
+              NORTH = 0,
+              EAST,
+              SOUTH,
+              WEST
+            };
+
+            <span style="font-style: italic">// DFS node:</span>
+            <span style="font-weight: bold">struct</span> Node {
+              <span style="font-weight: bold">bool</span> visited;
+            };
+
+            Node maze[MAZE_X][MAZE_Y];
+
+            <span style="font-style: italic">// A-Star location</span>
+            <span style="font-weight: bold">struct</span> loc {
+              <span style="font-weight: bold">int</span> x;
+              <span style="font-weight: bold">int</span> y;
+            };
+
+            <span style="font-style: italic">// A-Star movement</span>
+            <span style="font-weight: bold">struct</span> movement {
+              <span style="font-weight: bold">int</span> dx;
+              <span style="font-weight: bold">int</span> dy;
+              <span style="font-weight: bold">float</span> cost;
+            };
+
+            <span style="font-style: italic">// A-Star cost </span>
+            <span style="font-weight: bold">struct</span> cost {
+              <span style="font-weight: bold">float</span> start_node_estimated_cost_to_goal;
+              <span style="font-weight: bold">float</span> start_node_cost;
+              loc start;
+              loc prev;
+            };
+
+
+            loc path[MAZE_X*MAZE_Y] = {};
+            <span style="font-weight: bold">int</span> path_index = 0;
+
+            movement mvmts[4];
+
+            <span style="font-weight: bold">int</span> grid[MAZE_X][MAZE_Y] =  { {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1},
+                                          {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1},
+                                          {1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+                                          {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+            </pre>
+        </div>
+        <p>Since I wasn’t using localization and there weren’t any lines to detect to keep Klaus on track, I defined the
+          following motion functions. They were tuned so that Klaus would stay on as straight of a line as possible and
+          make close to 90 degree turns. goToIntersection specifically makes sure that the motors move the robot a
+          distance equivalent to one square of the map.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">void</span> forward() {
+          myMotorDriver.setDrive(0,1,100); <span style="font-style: italic">//drive right motor</span>
+          myMotorDriver.setDrive(1,1,125); <span style="font-style: italic">//drive left motor</span>
+        }
+
+        <span style="font-weight: bold">void</span> stopWheels() {
+          myMotorDriver.setDrive(0,1,0); <span style="font-style: italic">//drive right motor</span>
+          myMotorDriver.setDrive(1,1,0); <span style="font-style: italic">//drive left motor</span>
+        }
+
+        <span style="font-weight: bold">void</span> turnLeft() {
+          myMotorDriver.setDrive(0,1,200); <span style="font-style: italic">//drive right motor</span>
+          myMotorDriver.setDrive(1,0,0); <span style="font-style: italic">//drive left motor</span>
+          delay(200);
+          stopWheels();
+          orientLeft();
+        }
+
+        <span style="font-weight: bold">void</span> turnRight() {
+          myMotorDriver.setDrive(0,1,0); <span style="font-style: italic">//drive right motor</span>
+          myMotorDriver.setDrive(1,0,200); <span style="font-style: italic">//drive left motor</span>
+          delay(200);
+          stopWheels();
+          orientRight();
+        }
+
+        <span style="font-weight: bold">void</span> turnAround() {
+          myMotorDriver.setDrive(0,1,0); <span style="font-style: italic">//drive right motor</span>
+          myMotorDriver.setDrive(1,0,200); <span style="font-style: italic">//drive left motor</span>
+          delay(800);
+          <span style="font-style: italic">// while( either frontSensor senses black ) {keep turning left}</span>
+          stopWheels();
+          orientTurnAround();
+        }
+
+        <span style="font-style: italic">// goToIntersection ---------------------------------------------------</span>
+        <span style="font-weight: bold">void</span> goToIntersection() {
+          <span style="font-weight: bold">for</span>(<span style="font-weight: bold">volatile</span> <span style="font-weight: bold">int</span> count = 0;count&lt;1000;count++){
+            forward();
+          }
+          sendMessage();
+          stopWheels();
+        }
+        </pre>
+        </div>
+        <p>A series of orienting functions kept track and updated the orientation of the robot. The initial direction
+          was north, pointing in the positive direction on the x axis.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">void</span> orientLeft() {
+          <span style="font-weight: bold">if</span> (dir &gt; 0) {
+            dir = dir - 1;
+          }
+          <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dir == 0) {
+            dir = 3;
+          }
+        }
+
+        <span style="font-weight: bold">void</span> orientRight() {
+          <span style="font-weight: bold">if</span> (dir &lt; 3) {
+            dir = dir + 1;
+          }
+          <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dir == 3) {
+            dir = 0;
+          }
+        }
+
+        <span style="font-weight: bold">void</span> orientTurnAround() {
+          <span style="font-weight: bold">if</span> (dir == 0) {
+            dir = 2;
+          }
+          <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dir == 1) {
+            dir = 3;
+          }
+          <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dir == 2) {
+            dir = 0;
+          }
+          <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dir == 3) {
+            dir = 1;
+          }
+        }
+        </pre>
+        </div>
+        <p>The grid map identifies the areas where the robot can’t travel due to an obstacle, but considering the motion
+          of the robot wasn’t going to be checked in any way, I added checks to see if there was anything within range
+          of both the time of flight and proximity sensors. The redundancy wasn’t super necessary since each was
+          configured to trigger when an obstacle was around half a foot in front of them (well within the capped range
+          of the ToF sensor) but didn’t hurt.</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">boolean frontObstacle(){
+            <span style="font-weight: bold">return</span> (distance &lt; 100 &amp;&amp; proxValue &gt; 100);
+          }
+
+          <span style="font-weight: bold">bool</span> northWallDetection(<span style="font-weight: bold">int</span> x, <span style="font-weight: bold">int</span> y) {
+            <span style="font-weight: bold">return</span> grid[x+1][y+1];
+          }
+
+          <span style="font-weight: bold">bool</span> eastWallDetection(<span style="font-weight: bold">int</span> x, <span style="font-weight: bold">int</span> y) {
+            <span style="font-weight: bold">return</span> grid[x][y+1];
+          }
+
+          <span style="font-weight: bold">bool</span> westWallDetection(<span style="font-weight: bold">int</span> x, <span style="font-weight: bold">int</span> y) {
+            <span style="font-weight: bold">return</span> grid[x][y-1];
+          }
+          </pre>
+        </div>
+        <p>After being connected via Bluetooth, the starting signal was set to true and Klaus was primed to move between
+          the hardcoded points. If I had more time I would’ve configured the Python script to send over starting and
+          goal coordinates and the Arduino program to receive them. transverseHelper is the DFS function, called
+          recursively on each new point to check out, and a_star is almost exactly the same as the Python code used in
+          the simulation.</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">void</span> loop() {
+            sendMessage();
+            <span style="font-style: italic">//motorRamp = true;</span>
+            <span style="font-weight: bold">if</span> (motorRamp) {
+                  t0 = micros(); <span style="font-style: italic">// start time</span>
+                  <span style="font-style: italic">//goToIntersection();</span>
+                  loc start = {4,1};
+                  loc goal = {goalX,goalY};
+                  get_movements();
+                  <span style="font-style: italic">//traverseHelper(start.x,start.y); //DFS</span>
+                  <span style="font-style: italic">//Serial.printf(&quot;%d,%d\n&quot;,goal.x,goal.y);</span>
+                  a_star(start, goal,3);
+              <span style="font-style: italic">// stop and wait &#39;forever&#39; when done with maze</span>
+                  <span style="font-weight: bold">while</span> (1){};
+            }
+          }
+          </pre>
+        </div>
+        <p>Depth first search will traverse a path as far as it can go (meaning it has nodes to visit that haven’t yet
+          been visited and don’t contain an obstacle). If it has reached the end of a path and its coordinates aren’t
+          equal to those of the goal node, it backtracks to the start of the next available path to travel down. The
+          recursive nature of this algorithm adds calls to new nodes onto the stack to be calculated and moved to before
+          popping off to eventually backtrack to the starting node. A series of if statements based on the robot’s
+          orientation check which direction the robot can physically move in without hitting an obstacle. Moving forward
+          is prioritized, then moving to the left, and finally moving to the right; backtracking, or moving backwards,
+          is the last resort and is only used when a potential path has been exhausted or the goal has been reached.
+          Every new proposed node calls a new instance of traverseHelper, adding more calls to the stack which will be
+          responsible for actually moving the robot.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">void</span> traverseHelper(<span style="font-weight: bold">int</span> coordX, <span style="font-weight: bold">int</span> coordY) {
+            Serial.printf(<span style="font-style: italic">&quot;%d, %d</span><span style="font-weight: bold; font-style: italic">\n</span><span style="font-style: italic">&quot;</span>,coordX,coordY);
+            distance = distanceSensor.getDistance(); <span style="font-style: italic">//Get the result of the measurement from the ToF sensor</span>
+            proxValue = proximitySensor.getProximity();  <span style="font-style: italic">//Get result from prox sensor</span>
+            distanceSensor.clearInterrupt();
+            
+            <span style="font-weight: bold">int</span> nextX = 0, nextY = 0;
+            <span style="font-weight: bold">if</span> (coordX == MAZE_X || coordY == MAZE_Y) {
+              <span style="font-weight: bold">return</span>;
+            }
+            <span style="font-weight: bold">if</span> (coordX == goalX &amp;&amp; coordY == goalY) {
+              Serial.println(<span style="font-style: italic">&quot;GOAL REACHED!&quot;</span>);
+              <span style="font-weight: bold">return</span>;
+            }
+
+            maze[coordX][coordY].visited = true;
+            ::x = coordX; ::y = coordY;
+            
+            <span style="font-weight: bold">int</span> referenceDir  = dir;
+            <span style="font-weight: bold">switch</span> (dir) {
+              <span style="font-weight: bold">case</span> NORTH: {
+                  <span style="font-weight: bold">if</span> (!northWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX + 1][coordY].visited) {
+                      goToIntersection();
+                      nextX = coordX + 1;
+                      nextY = coordY;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!eastWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX][coordY + 1].visited) {
+                      decideLeft(referenceDir);
+                      nextX = coordX;
+                      nextY = coordY + 1;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!westWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX][coordY - 1].visited) {
+                      decideRight(referenceDir);
+                      nextX = coordX;
+                      nextY = coordY - 1;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+                  <span style="font-weight: bold">break</span>;
+                }
+              <span style="font-weight: bold">case</span> EAST: {
+                  <span style="font-weight: bold">if</span> (!northWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX][coordY - 1].visited) {
+                      goToIntersection();
+                      nextX = coordX;
+                      nextY = coordY - 1;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!eastWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX + 1][coordY].visited) {
+                      decideLeft(referenceDir);
+                      nextX = coordX + 1;
+                      nextY = coordY;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!westWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX - 1][coordY].visited) {
+                      decideRight(referenceDir);
+                      nextX = coordX - 1;
+                      nextY = coordY;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+                  <span style="font-weight: bold">if</span> (nextX == 0 &amp;&amp; nextY == 0) {
+                    <span style="font-style: italic">//turnAround();</span>
+                    <span style="font-style: italic">//goToIntersection();</span>
+                    <span style="font-style: italic">//          updateCoordinates();</span>
+                  } <span style="font-weight: bold">else</span> {
+                    <span style="font-style: italic">//          moveSrcToDest(coordX - nextX, coordY - nextY);</span>
+                    <span style="font-style: italic">//updateCoordinates();</span>
+                  }
+                  <span style="font-weight: bold">break</span>;
+                }
+              <span style="font-weight: bold">case</span> SOUTH: {
+                  <span style="font-weight: bold">if</span> (!northWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX - 1][coordY].visited) {
+                      goToIntersection();
+                      nextX = coordX - 1;
+                      nextY = coordY;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!eastWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX][coordY - 1].visited) {
+                      decideLeft(referenceDir);
+                      nextX = coordX;
+                      nextY = coordY - 1;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!westWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX][coordY + 1].visited) {
+                      decideRight(referenceDir);
+                      nextX = coordX;
+                      nextY = coordY + 1;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+                  <span style="font-weight: bold">if</span> (nextX == 0 &amp;&amp; nextY == 0) {
+                    <span style="font-style: italic">//turnAround();</span>
+                    <span style="font-style: italic">//goToIntersection();</span>
+                    <span style="font-style: italic">//          updateCoordinates();</span>
+                  } <span style="font-weight: bold">else</span> {
+                    <span style="font-style: italic">//        moveSrcToDest(coordX - nextX, coordY - nextY);</span>
+                    <span style="font-style: italic">//updateCoordinates();</span>
+                  }
+                  <span style="font-weight: bold">break</span>;
+                }
+              <span style="font-weight: bold">case</span> WEST: {
+                  <span style="font-weight: bold">if</span> (!northWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX][coordY + 1].visited) {
+                      goToIntersection();
+                      nextX = coordX;
+                      nextY = coordY + 1;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!eastWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX - 1][coordY].visited) {
+                      decideLeft(referenceDir);
+                      nextX = coordX - 1;
+                      nextY = coordY;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+
+                  <span style="font-weight: bold">if</span> (!westWallDetection(coordX,coordY)) {
+                    <span style="font-weight: bold">if</span> (!maze[coordX + 1][coordY].visited) {
+                      decideRight(referenceDir);
+                      nextX = coordX + 1;
+                      nextY = coordY;
+                      traverseHelper(nextX, nextY);
+                      moveSrcToDest(coordX - nextX, coordY - nextY);
+                    }
+                  }
+                  <span style="font-weight: bold">if</span> (nextX == 0 &amp;&amp; nextY == 0) {
+                    <span style="font-style: italic">//turnAround();</span>
+                    <span style="font-style: italic">//goToIntersection();</span>
+                    <span style="font-style: italic">//          updateCoordinates();</span>
+                  } <span style="font-weight: bold">else</span> {
+          <span style="font-style: italic">//                  moveSrcToDest(coordX - nextX, coordY - nextY);</span>
+                    <span style="font-style: italic">//updateCoordinates();</span>
+                  }
+                  <span style="font-weight: bold">break</span>;
+                }
+            }
+          }
+          </pre>
+        </div>
+        <p>The function responsible for moving the physical robot is extremely similar to that of the virtual one. It
+          checks the orientation of the robot before seeing if it needs to move in the positive/negative x/y direction.
+          This helps it decide whether it needs to turn before moving forward, and if so, in which direction.</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">void</span> moveSrcToDest(<span style="font-weight: bold">int</span> dx, <span style="font-weight: bold">int</span> dy) {
+            <span style="font-weight: bold">switch</span> (dir) {
+              <span style="font-weight: bold">case</span> NORTH: {
+                  <span style="font-weight: bold">if</span> (dx == -1) {
+                    turnAround();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dx == 1) {
+                    <span style="font-style: italic">// Go forward</span>
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == -1) {
+                    turnRight();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == 1) {
+                    turnLeft();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> {
+                    <span style="font-style: italic">// Do nothing</span>
+                  }
+                  <span style="font-style: italic">// goToIntersection();</span>
+
+                  <span style="font-weight: bold">break</span>;
+                }
+              <span style="font-weight: bold">case</span> EAST: {
+                  <span style="font-weight: bold">if</span> (dx == -1) {
+                    turnRight();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dx == 1) {
+                    turnLeft();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == -1) {
+                    <span style="font-style: italic">// Do nothing</span>
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == 1) {
+                    turnAround();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> {
+                    <span style="font-style: italic">// Do nothing</span>
+                  }
+                  <span style="font-style: italic">//goToIntersection();</span>
+
+                  <span style="font-weight: bold">break</span>;
+                }
+              <span style="font-weight: bold">case</span> SOUTH: {
+                  <span style="font-weight: bold">if</span> (dx == -1) {
+                    <span style="font-style: italic">// Do nothing</span>
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dx == 1) {
+                    turnAround();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == -1) {
+                    turnLeft();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == 1) {
+                    turnRight();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> {
+                    <span style="font-style: italic">// Do nothing</span>
+                  }
+                  <span style="font-style: italic">//goToIntersection();</span>
+
+                  <span style="font-weight: bold">break</span>;
+                }
+              <span style="font-weight: bold">case</span> WEST: {
+                  <span style="font-weight: bold">if</span> (dx == -1) {
+                    turnLeft();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dx == 1) {
+                    turnRight();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == -1) {
+                    turnAround();
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> <span style="font-weight: bold">if</span> (dy == 1) {
+                    <span style="font-style: italic">// Do nothing</span>
+                    goToIntersection();
+                  } <span style="font-weight: bold">else</span> {
+                    <span style="font-style: italic">// Do nothing</span>
+                  }
+                  <span style="font-style: italic">//goToIntersection();</span>
+
+                  <span style="font-weight: bold">break</span>;
+                }
+            }
+          }
+          </pre>
+        </div>
+        <p>Unfortunately, before I could get a video of this algorithm playing out on Klaus, one of my batteries died
+          while my backup’s ground wire snapped. However, since there’s a lack of localization, I was able to prove
+          functionality by screen recording output to the serial monitor (and also to the Bluetooth connection on my
+          host computer). The first video is of DFS and the second is of A-Star. It’s important to note that DFS
+          performs worse than A-Star due to its natural need to check out more nodes, while A-Star optimizes for cost
+          before travelling down a path.</p>
+        <!-- DFS -->
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/eAZ2U_z8e4s" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <!-- ASTAR -->
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/_6fDjskgvPk" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+  <footer class="ftco-footer ftco-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+
+          <p>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;
+            <script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with
+            <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com"
+              target="_blank">Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
+      <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+      <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
+        stroke="#F96D00" /></svg></div>
+
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/scrollax.min.js"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="js/google-map.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
