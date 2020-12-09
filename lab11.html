@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>ECE 4960 Fast Robots</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="css/animate.css">
+
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+        aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="oi oi-menu"></span> Menu
+      </button>
+
+      <div class="collapse navbar-collapse" id="ftco-nav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+          <!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+          <!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- END nav -->
+
+  <section class="hero-wrap degree-right js-fullheight">
+    <div class="home-slider js-fullheight owl-carousel">
+      <div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+        <div class="overlay"></div>
+        <div class="container">
+          <div class="row no-gutters slider-text js-fullheight align-items-center">
+            <div class="col-md-12 ftco-animate">
+              <div class="text">
+                <h1 class="mb-4">Lab 11</h1>
+                <p>LQR on the Inverted Pendulum on a Cart</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ftco-section ftco-portfolio bg-light">
+    <div class="row justify-content-center no-gutters">
+      <div class="col-md-8 heading-section ftco-animate mb-5">
+        <h2 class="mb-2 text-center">Objective</h2>
+        <p>The purpose of this lab was to implement linear feedback control through a simulation in order to balance an
+          inverted pendulum on the back of a virtual robot. This involved taking a naturally non-linear system and
+          controlling it via matrix operations in order to get to a stable point, both in idealized and noisy scenarios.
+        </p>
+
+        <h2 class="mb-2 text-center">The Math</h2>
+        <p>Both the inverted pendulum and cart have forces acting on them, as described in the force body diagram below.
+          In our case, the inverted pendulum was affixed to a point on the cart, allowing it to rotate around it, and
+          the cart restricted to a single degree of motion in the +/- x direction. These forces are combined to
+          determine the state vector for the system as a whole. </p>
+        <img width=800 height=300 src="images/lab11/fbd.png" style="display:block;margin: 0 auto;">
+        <p>As mentioned before, this is a naturally non-linear system, making it inherently more difficult to determine
+          the control necessary to bring the whole system to a desired state vector. The goal is to linearize the system
+          within the structure of x_dot = Ax+Bu, where A and B are matrices and x and u are column vectors. A describes
+          how the whole system changes over time and is paired with x, the state vector of the system in the form of [x
+          x_dot theta theta_dot]^T. B describes how the whole system will respond to an actuation force, given by u.
+        </p>
+        <img src="images/lab11/axb.png" style="display:block;margin: 0 auto;">
+        <p>The control vector u is linear, equal to -Kx to try and bring the system back to its fixed point by negating
+          its current state in x. This equation can then be substituted into the earlier equation for x_dot, becoming (A
+          - BK)x. This linearly controlled equation has eigenvalues that determine how stable the entire system can be.
+          If these eigenvalues are negative, it leads to system stability (in the case of the inverted pendulum, this
+          means staying upright).
+        </p>
+        <h2 class="mb-2 text-center">Simulation</h2>
+        <p>We were provided the following Python scripts:</p>
+        <ol>
+          <li>pendulumParam.py: initializes physical pendulum parameters and state space equations.</li>
+          <li>pendulumControllerDynamics.py: describes the nonlinear dynamics of the system.</li>
+          <li>signalGenerator.py: computes various reference functions to test the pendulum.</li>
+          <li>pendulumAnimation.py: helper functions for animating the system.</li>
+          <li>plotDataZ.py: helper functions to plot state variables and reference values for debugging.</li>
+          <li>runSimulation.py: integrates the entire vector field using the controller and the true nonlinear dynamics,
+            and plots the results.</li>
+        </ol>
+        <p>
+          The first step to implementing feedback control was to specify the parameters of the robot. The mass was
+          changed to 522g (as recorded in lab 3) and the damping coefficient to 1.8Ns (based on the more realistic value
+          Professor Petersen mentioned).
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic">#Physical parameters of the inverted pendulum known to the controller</span>
+m1 = 0.03  <span style="font-style: italic"># Mass of the pendulum [kg]</span>
+m2 = .522  <span style="font-style: italic"># Mass of the cart [kg]</span>
+ell = 1.21  <span style="font-style: italic"># Length of the rod [m]</span>
+g = -9.81  <span style="font-style: italic"># Gravity, [m/s^2]</span>
+b = 1.8  <span style="font-style: italic"># Damping coefficient [Ns]</span>
+</pre>
+        </div>
+        <p>Next came the eigenvalues. Negative eigenvalues ensure a more stable system, but I didn’t know how negative I
+          should go to start. Noting that the eigenvalues shouldn’t be the same, I started with -0.1, -0.2, -0.3, and
+          -0.4. The results are shown in the graph and video below.
+        </p>
+        <p>There was for more aggressive control of the system to bring the cart and pendulum back to their fixed
+          position, so I incrementally worked through each eigenvalue, making them more negative until I reached a set
+          of values that relatively stabilized the system. Note that more negative values brought the system closer to
+          its setpoint, rather than fly off the screen. My final eigenvalues were -1.1, -1.2, -1.3, and -1.4, which
+          didn’t lead to a perfectly still system but managed to balance the inverted pendulum pretty well without too
+          large of a range of motion.
+        </p>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/16jHFBSd44Y" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/original_dpoles.png" style="display:block;margin: 0 auto;"><br>
+        <i style="text-align: center;">-0.1, -0.2, -0.3, -0.4</i>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/WB_XPdBbtE4" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/dpoles_1.1.png" style="display:block;margin: 0 auto;"><br>
+        <i style="text-align: center;">-1.1, -0.2, -0.3, -0.4</i>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/pt5dbBy5PWg" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/dpoles_1.2.png" style="display:block;margin: 0 auto;"><br>
+        <i style="text-align: center;">-1.1, -1.2, -0.3, -0.4</i>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/Fr-Kac2JUno" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/dpoles_1.3.png" style="display:block;margin: 0 auto;"><br>
+        <i style="text-align: center;">-1.1, -1.2, -1.3, -0.4</i>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/HDaJ5D9aW-A" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/secondary_dpoles.png" style="display:block;margin: 0 auto;"><br>
+        <i style="text-align: center;">-1.1, -1.2, -1.3, -1.4—my final dpoles</i>
+        <p>This was all specifically accomplished with the following code framework.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"> <span style="font-weight: bold">import</span> <span style="font-weight: bold">control</span>
+ dpoles = np.array([..insert eigenvalue1.., \
+ ..insert eigenvalue2.., \
+ ..insert eigenvalue3.., \
+ ..insert eigenvalue4..])
+Kr = control.place(p.A,p.B,dpoles)
+self.u = Kr * (np.subtract(des_state, curr_state))
+</pre>
+        </div>
+        <p>The A and B matrices were imported from pendulumParam.py. self.u is set to -Kx, where x is the difference
+          between the desired state and the current state. The lack of negation here is due to the order of subtraction
+          between curr_state and des_state; if it were flipped (curr_state - des_state) then there would be a need for a
+          negative sign.
+          A more sophisticated form of feedback control comes in the form of a Linear Quadratic Regulator. This uses two
+          matrices, Q and R, to determine the value of K through the Riccati equation.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-style: italic">#solve algebraic Riccati equation (ARE)</span>
+S = scipy.linalg.solve_continuous_are(p.A, p.B, Q, R)
+<span style="font-style: italic"># Solve the Riccati equation and compute the LQR gain</span>
+Kr = np.linalg.inv(R).dot(p.B.transpose().dot(S))
+</pre>
+        </div>
+        <p>Each matrix penalizes changes in the system differently: Q emphasizes changes in the state vector, while R
+          emphasizes changes in the control vector. This was mentioned in lecture as well as in <a
+            href="https://jonathan-hui.medium.com/rl-lqr-ilqr-linear-quadratic-regulator-a5de5104c750">Medium
+            article</a>,
+          <a href="https://towardsdatascience.com/optimal-control-lqr-417b41e10d0d">this tutorial</a>, and <a
+            href="https://www.researchgate.net/post/how_to_determine_the_values_of_the_control_matrices_Q_and_R_for_the_LQR_strategy_when_numerically_simulating_the_semi-active_TLCD">this
+            explanation</a>.
+        </p>
+        <p>I started first with the following Q and R matrices, and below are its results. The system stabilizes to its
+          setpoint but the motion is unrealistic, switching quickly from sitting still to swaying to one side of the
+          simulation.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">Q = np.matrix([[1, 0.0, 0.0, 0.0], [0.0, 1, 0.0, 0.0],
+          [0.0, 0.0, 10, 0.0], [0.0, 0.0, 0.0, 100]])
+          R = np.matrix([0.001])
+          </pre>
+        </div>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/yADYQytaCHY" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/ORIGINAL_QR.png" style="display:block;margin: 0 auto;">
+        <p>Increasing R to [1000] improved on this front, as it slowed down the balancing motions needed to bring the
+          system back to the setpoint.
+        </p>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/wNZRBpC87XM" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/orig_Q_large_R.png" style="display:block;margin: 0 auto;">
+        <p>On the other hand, decreasing R to 0.0001 exacerbated this problem and combined the slow movements with the
+          quick jerks across the simulation.
+        </p>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/pAdjo6YGAvw" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe><img src="images/lab11/orig_Q_small_R.png" style="display:block;margin: 0 auto;">
+        <p>Considering the complexity of tuning both Q and R, I chose to keep Q as the same provided matrix and focus my
+          efforts on R (i.e. the control vector). I learned that larger Rs will penalize motion more expensively, hence
+          smaller and slower movements, while smaller Rs will allow the system to move in large swathes with little
+          penalty. With R set to 1000, my eigenvalues were as follows. These seemed reasonable to me, as they were all
+          negative to varying degrees, more so when controlling the theta parameters (as controlling the inverted
+          pendulum is more of a task than the cart).
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">[-0.01756579+0.j         -3.68824985+0.j         -2.64540865+0.18562646j
+          -2.64540865-0.18562646j]
+         </pre>
+        </div>
+        <h2 class="mb-2 text-center">A More Realistic Simulation</h2>
+        <p>In this idealized experiment, there is drag and friction but no caps on the potential actuation of the
+          motors. As seen in lab 6 onwards, this isn’t the case with our real robot and therefore had to be taken into
+          account. First there’s deadband, which is the lowest value at which the motors will be able to move the cart.
+          Taking values from lab 3, I calculated this value to be equal to (120 / 255) * (3.33) * (0.522)—120 was the
+          new deadband value I recorded after taping my wheels, 255 was the motor value at which the max acceleration
+          was found, 3.33m/s^2 is the max acceleration from lab 3, and 0.522 is the total mass of the car from lab 3.
+          Saturation is related to this value, expressing the maximum potential force applied by the motors: F = ma =
+          total mass * max acceleration = 0.522 * 3.33. The following code kept u within these boundaries:
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">if</span> orig_u &gt; 0:
+          <span style="font-weight: bold">if</span> orig_u &lt; deadband:
+          self.u = np.array([0])
+      <span style="font-style: italic"># elif orig_u &gt; (0.5 * deadband) and orig_u &lt; deadband:</span>
+      <span style="font-style: italic"># self.u = np.array([deadband])</span>
+      <span style="font-weight: bold">elif</span> orig_u &gt; saturation:
+          self.u = np.array([saturation])
+      <span style="font-weight: bold">else</span>:
+          self.u = orig_u
+<span style="font-weight: bold">else</span>:
+      <span style="font-weight: bold">if</span> orig_u &gt; (-1 * deadband):
+          self.u = np.array([0])
+      <span style="font-style: italic"># elif orig_u &lt; (-0.5 * deadband) and orig_u &gt; (-1 * deadband):</span>
+      <span style="font-style: italic"># self.u = np.array([-1 * deadband])</span>
+      <span style="font-weight: bold">elif</span> orig_u &lt; (-1 * saturation):
+          self.u = np.array([-1 * saturation])
+      <span style="font-weight: bold">else</span>:
+          self.u = orig_u
+</pre>
+        </div>
+        <p>The original signal generated by this simulation was a square wave; this didn’t jive at all with the
+          conditionals for cutting off at deadband and would crash the simulation. As described by the professor, a
+          vertical signal failed to correct itself due to deadband. The solution for this was to change the signal to
+          that of a sinusoid, therefore never requiring the cart to stand still.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">ref = signalGen(amplitude=500, frequency=.5, y_offset=0)
+ctrl = pendulumCnt(param=P,zref=ref.sin)
+</pre>
+        </div>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/TWUcPoI_FTU" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <p>Changing the amplitude and frequency of this sinusoid allowed for my system to work within deadband and
+          saturation to stabilize without crashing.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">ref = signalGen(amplitude=160, frequency=0.8,  y_offset=0)  <span style="font-style: italic">#worked to accommodate deadband</span>
+ctrl = pendulumCnt(param=P, zref=ref.sin)
+</pre>
+        </div>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/Lre5VQ7_pRo" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+
+        <p>Sensor noise is also abundant in the real world, especially in Klaus. For example, the time of flight sensor
+          had around 2% sigma error in lab 5. To simulate noise, I used a Gaussian distribution called with
+          random.gauss( ) on all four elements of the state vector. I didn’t have time to look into noise on elements
+          other than the x (in this code, z) of the state vector, but I can promise you it exists.
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"> mu = 0
+          sig_z = 0.02
+          sig_z_dot = 0.000
+          sig_theta = 0.000
+          sig_theta_dot = 0.000
+          noise = np.array([[random.gauss(mu, sig_z)],
+                            [random.gauss(mu, sig_z_dot)],
+                            [random.gauss(mu, sig_theta)],
+                            [random.gauss(mu, sig_theta_dot)]])
+          <span style="font-style: italic">#print(noise)</span>
+          noise_state = np.add(curr_state, noise)
+          noise_state[2] = self.limitTheta(noise_state[2])
+  </pre>
+        </div>
+        <p>Rather than try to tackle all four noisy variables at once, it was recommended we focus on one. I chose z
+          since I had an error percentage in mind and tuned Q and R with the previously defined sinusoidal signal. Below
+          is my best run with the following matrices and a siq_z of 0.0001 (since 0.02 was too big of a value to tune
+          for):
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">Q = np.matrix([[3.0, 0.0, 0.0, 0.0], [0.0, 0.5, 0.0, 0.0],
+          [0.0, 0.0, 0.5, 0.0], [0.0, 0.0, 0.0, 3.0]])
+          R = np.matrix([13000.0
+                                 ])
+          </pre>
+        </div>
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/aDJwsFK1In4" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <img src="images/lab11/noise.png" style="display:block;margin: 0 auto;">
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="ftco-section bg-light">
+		<div class="container">
+			<div class="row justify-content-center mb-5">
+				<div class="col-md-7 heading-section text-center ftco-animate">
+					<h2>Recent Blog</h2>
+				</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 d-flex ftco-animate">
+					<div class="blog-entry justify-content-end">
+						<div class="text">
+							<h3 class="heading mb-3"><a href="#">Amplify your blockchain team</a></h3>
+							<a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">
+							</a>
+							<div class="meta mb-3">
+								<div><a href="#">June 01, 2020</a></div>
+								<div><a href="#">Admin</a></div>
+								<div><a href="#" class="meta-chat"><span class="fa fa-comment"></span> 3</a></div>
+							</div>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="degree-left-footer"></div>
+	</section>		 -->
+
+  <footer class="ftco-footer ftco-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+
+          <p>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;
+            <script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with
+            <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com"
+              target="_blank">Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
+      <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+      <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
+        stroke="#F96D00" /></svg></div>
+
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/scrollax.min.js"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="js/google-map.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
