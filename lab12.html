@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>ECE 4960 Fast Robots</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="css/animate.css">
+
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">ECE<span>4960</span>Caitlin Stanton</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+        aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="oi oi-menu"></span> Menu
+      </button>
+
+      <div class="collapse navbar-collapse" id="ftco-nav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+          <!-- <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+					<li class="nav-item"><a href="work.html" class="nav-link">Work</a></li>
+					<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li> -->
+          <!-- <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- END nav -->
+
+  <section class="hero-wrap degree-right js-fullheight">
+    <div class="home-slider js-fullheight owl-carousel">
+      <div class="slider-item js-fullheight" style="background-image:url(images/bg_1.jpg);">
+        <div class="overlay"></div>
+        <div class="container">
+          <div class="row no-gutters slider-text js-fullheight align-items-center">
+            <div class="col-md-12 ftco-animate">
+              <div class="text">
+                <h1 class="mb-4">Lab 12</h1>
+                <p>LQG on the Inverted Pendulum on a Cart</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ftco-section ftco-portfolio bg-light">
+    <div class="row justify-content-center no-gutters">
+      <div class="col-md-8 heading-section ftco-animate mb-5">
+        <h2 class="mb-2 text-center">Objective</h2>
+        <p>There are many forms of control when looking at any system, including that of an inverted pendulum, and this
+          lab explored one of them: the Kalman filter. Building off of the knowledge of filters and nonlinear systems
+          from the last lab, this was meant to look into a different way of stabilizing the inverted pendulum with the
+          motion of the simulated robot.
+        </p>
+
+        <h2 class="mb-2 text-center">Kalman Filter</h2>
+        <p>While the linear quadratic regulator worked over continuous time with matrices Q (to penalize changes in the
+          state vector) and R (to penalize changes in the control vector), the Kalman filter is configured for discrete
+          time systems. This changed the A and B matrices from a continuous form with LQR to a discrete form with the
+          Kalman filter.
+        </p>
+        <p>The C matrix affects which states are being measured directly and which are being estimated. Every entry is
+          either a 0 or 1; if a row vector contains a 1, that aspect of the state is being measured directly. With the
+          linear quadratic regulator, the C matrix was the following:
+        </p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">C = np.matrix([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0],
+          [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+        </pre>
+        </div>
+        <p>meaning that all of the states were being measured. For the Kalman filter, the C matrix is:</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">C = np.matrix([[0.0, 0.0, 0.0, 1.0]]) 
+        </pre>
+        </div>
+        <p>This shows that the only state being measured is the fourth one, equivalent to the theta dot value.</p>
+        <p>Before I could find out whether or not the A or C matrices were observable, I ran into this error
+          <code>```AttributeError: 'float' object has no attribute 'sin' ```</code> when running the runSimulation.py
+          script. Fixing
+          it required changing theta to theta[0] in the np.sin and np.cos calls in runSimulation and pendulumAnimation.
+          Once that was out of the way, I got the following behavior:
+        </p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/pMEZf70O0BM" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/original.png" style="display:block;margin: 0 auto;">
+
+        <p>To see whether or not the state is observable, I printed control.obsv(P.A,P.C):</p>
+        <img src="images/lab12/A_C_observable.png" style="display:block;margin: 0 auto;">
+
+        <p>The first column vector contains all zeros showing that the matrix is rank deficient. This was emphasized
+          when printing the value of np.linalg.matrix_rank(control.obsv(A,C)) and seeing it was 3. This means that not
+          all states within the system matrix are observable.</p>
+
+        <h2 class="mb-2 text-center">Adding Realistic Noise</h2>
+        <p>There are many potential sources of noise within the system. With this program we focused on adding process
+          (sigma_u) and measurement (sigma_n) noise to test the robustness of the filter. pendulumNonlinearDynamics had
+          a line commented out that added a random amount of noise.</p>
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">dydt = [ydot0 + np.random.randn()*0.01, ydot1 + np.random.randn()*0.01, ydot2 + np.random.randn()*0.01, ydot3 + np.random.randn()*0.01]
+          </pre>
+        </div>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/dBJ43fb28OI" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+
+        <p>There was some sway of the system, but overall the inverted pendulum was able to right itself without too
+          much movement. Unfortunately, real-world systems also tend to have a good amount of sensor noise, so I had to
+          add some random amount of noise at every timestep. The loop on t_array within runSimulation accomplishes this,
+          and within it the variable y_kf takes the dot product of the previous state vector and the C matrix before
+          being used in the Kalman filter. Therefore I added np.random.randn() to this value, which added a value from a
+          Gaussian)distribution of mean 0 and variance 1. This caused the system to act as such:</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/iKGm8hlPatQ" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/sensor_noise.png" style="display:block;margin: 0 auto;">
+
+        <p>I changed this to y_kf = P.C.dot(old_state) + np.random.randn() * 0.01 to match the same range of noise as
+          process noise. The resulting behavior was as such:</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/3VhuK1E1wlM" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/more_reasonable_sensor_noise.png" style="display:block;margin: 0 auto;">
+
+        <h2 class="mb-2 text-center">Adding Discrepancy to the Initial State</h2>
+        <p>The initial state of the system is the initial values for each aspect of the state vector when the system
+          first runs. Originally this was defined as mu = np.array([[P.z0], [P.zdot0], [P.theta0], [P.thetadot0]]).
+          Considering the level of process and measurement noise I added previous, first I added 0.01 to each term of
+          the initial state. This didn’t affect the behavior of the system much:</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/1YMF9Ksskxw" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/mu_0.01.png" style="display:block;margin: 0 auto;">
+
+        <p>I took things a step further by increasing the magnitude of the added factor by 10 (to 0.1). This seemed to
+          be a value that wouldn’t make too large an impact on each of the aspects of the state vector (since the ranges
+          for their values could easily absorb it, i.e. -2 to 2 for z). </p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/JUdIE_vLVSI" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/mu_0.1.png" style="display:block;margin: 0 auto;">
+
+        <p>I wanted to see how far I could push it when adding to the initial state before the Kalman filter was
+          overwhelmed. Following the trend of increasing by an order of magnitude, I added 1 and saw the cart promptly
+          run off the side of the screen, eventually coming back to stabilize:</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/e_0MSrTJH-4" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/mu_1.png" style="display:block;margin: 0 auto;">
+
+        <p>Performing a binary search between 1 and 0.1, I added 0.5 and the cart didn’t run off the screen. </p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/udJJ2hpTyZI" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/mu_0.5.png" style="display:block;margin: 0 auto;">
+
+        <p>However, I decided to stick with 0.1 since 0.5 would have jerky motion every now and then.</p>
+
+        <h2 class="mb-2 text-center">Saturation and Deadband</h2>
+        <p>Lab 11 involved adding boundaries on the motion of the system using saturation and deadband values calculated
+          with numbers about the real robot from earlier labs. </p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">deadband = (120 / 255) * (3.33) * (0.522)  <span style="font-style: italic">#~0.8 = deadband of robot/motorval (from lab 6) * acc * mass</span>
+          saturation = 0.522 * 3.33
+          </pre>
+        </div>
+
+        <p>From that experience, I knew I had to find the control vector u and perform a series of conditional
+          statements
+          on it in order to bound check around the saturation and deadband values. u was within the t_array loop in
+          runSimulation, equal to u = -Kr.dot(mu - des_state). I implemented the following code after that expression:
+        </p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">if</span> u &gt; 0:
+            <span style="font-weight: bold">if</span> u &lt; deadband:
+            u = 0
+          <span style="font-weight: bold">elif</span> u &gt; saturation:
+            u = saturation
+          <span style="font-weight: bold">else</span>:
+          <span style="font-weight: bold">if</span> u &gt; (-1 * deadband):
+            u = 0
+          <span style="font-weight: bold">elif</span> u &lt; (-1 * saturation):
+            u = -1 * saturation
+          </pre>
+        </div>
+
+        <p>Here is what the simulation looked like after adding this code. Unlike the LQR filter, no additional tweaks
+          had to be made for the system to stabilize.</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/H_s1netDBXQ" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/sat_deadband.png" style="display:block;margin: 0 auto;">
+
+        <h2 class="mb-2 text-center">Changing the A and B Parameters</h2>
+        <p>At first, the A and B matrices were set to the following:</p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">A = np.matrix([[0.0, 1.0, 0.0, 0.0],
+                      [0.0, -b/m2, -m1*g/m2, 0.0],
+                      [0.0, 0.0, 0.0, 1.0],
+                      [0.0, -b/(m2*ell), -(m1+m2)*g/(m2*ell), 0.0]])
+            B = np.array([[0.0], [1.0/m2], [0.0], [1.0/(m2*ell)]])
+            </pre>
+        </div>
+
+        <p>I went through a lot of adjustments with these matrices to see how they each would react when changed
+          individually and changed together. When looking at the first coefficient of 1.01, the three combinations of A
+          and B being affected all ended up stabilizing. However, when both matrices were multiplied by the coefficient,
+          the system was smoother in its motions—A took longer to stabilize, while B was jerkier in its motions.</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/efZuI-k5ecw" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.01.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A * 1.01</i></p>
+
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/GWPJBcrPr0Q" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/B_1.01.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>B * 1.01</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/42bxAnL0LFI" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.01_B_1.01.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.01</i></p>
+
+        <p>I then checked out 1.5, 1.4, 1.3, 1.2, 1.1, 1.05, 1.03, and 1.02 to find the maximum bound that A and B could
+          be manipulated by. After 1.2, the cart ran off the side of the simulation and didn’t come back to stabilize
+          itself. A multiplier of 1.03 seems to be the max boundary for the system to come back and stabilize itself,
+          but it does have slight jerkiness to its movements.
+        </p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/YU1WGoLmpBw" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.5_B_1.5.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.5</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/_fEuylsJth4" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.4_B_1.4.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.4</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/-_rMUDrWNWE" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.3_B_1.3.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.3</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/iKh11kYy5jw" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.2_B_1.2.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.2</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/Ul2r5QSRB_g" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.1_B_1.1.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.1</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/EKZGKx5Y7ro" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.05_B_1.05.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.05</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/3GJIhUEBCUs" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.03_B_1.03.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.03</i></p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/I8jMFozYGLE" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/A_1.02_B_1.02.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>A and B * 1.02</i></p>
+
+        <h2 class="mb-2 text-center">Changing Update Time</h2>
+        <p>The initial value for the update time (found in pendulumParam) was 0.001. Sticking with the trend of making
+          changes by factors of 10, I increased the update time to 0.01 and saw a stable response.</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/QpiyczMQ00I" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/T_0.01.png" style="display:block;margin: 0 auto;">
+
+        <p>Another jump to 0.1 didn’t show that same stability.</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/rAhpGEfvcCk" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/T_0.1.png" style="display:block;margin: 0 auto;">
+
+        <p>A binary drop to 0.05 was still stable, so I continued working my way via 0.01 increments to find the point
+          at which the system loses its stability. I found this to be at 0.07.</p>
+
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/pNeyzVPl-H4" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/T_0.05.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>T = 0.05</i></p>
+
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/fGPZoGPj4rM" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/T_0.06.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>T = 0.06</i></p>
+
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/cWSzvk0YgHc" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/T_0.07.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>T = 0.07</i></p>
+
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/DXGDTvjLtUc" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/T_0.08.png" style="display:block;margin: 0 auto;">
+        <p style="text-align: center;"><i>T = 0.08</i></p>
+
+        <h2 class="mb-2 text-center">Comparison to Klaus</h2>
+        <p>As I’ve said before, Klaus is chock full of his own little quirks and disadvantages; therefore, I do believe
+          that this simulation is relatively accurate to how a real-world implementation would play out. With regards to
+          noise, the values of my time of flight sensors were never good enough for perfect localization and my motors
+          weren’t evenly calibrated for all surfaces. The motors also had their own mechanical constraints due to
+          deadband caused by friction (especially without the tape on his wheels). When sending data over the Bluetooth
+          connection, time to respond was slowed down considerably. I don’t think my configurations in the virtual space
+          would match Klaus perfectly, but they’d definitely imitate a more realistic version of my interactions with my
+          hardware.
+        </p>
+
+        <h2 class="mb-2 text-center">Extra Credit: Frequency of Measurements</h2>
+        <p>Sensors by nature will not read at the same frequency for various reasons (i.e. range, accuracy, noise). To
+          simulate this, thetadot was changed to be measured at a frequency of 100Hz and z to be measured at a frequency
+          of 10Hz. First the C matrix was adjusted to directly measure both z and thetadot (the first and fourth state
+          vectors).</p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%">C = np.matrix([[1.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 1.0]])
+</pre>
+        </div>
+
+        <p>The measurement noise added to y_kf from earlier was changed from np.random.randn() * 0.01 to
+          np.random.randn(2, 1) * 0.01 so as to add an array of randomized noise.</p>
+
+        <p>To change the frequency of reading measurements, I added the following function to kalmanFilter.py and
+          imported it into runSimulation.py. It uses a counter variable (implemented as t from the t_array loop in
+          runSimulation.py) to see if it’s a multiple of 10, to then update z and thetadot, otherwise just update
+          thetadot.</p>
+
+        <!-- HTML generated using hilite.me -->
+        <div
+          style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+          <pre style="margin: 0; line-height: 125%"><span style="font-weight: bold">def</span> kalmanFilterEC(mu, sigma, u, y, i):
+    <span style="font-weight: bold">if</span> i % 10 == 0:  <span style="font-style: italic">#frequency = 10Hz, for both thetadot, z</span>
+    C_KF = P.C
+    y_KF = y
+<span style="font-weight: bold">else</span>:  <span style="font-style: italic">#frequency = 100Hz, only for thetadot</span>
+    C_KF = P.C[1, :]
+    y_KF = y[1, :]
+
+mu_p = Ad.dot(mu) + Bd.dot(u)
+sigma_p = Ad.dot(sigma.dot(Ad.transpose())) + sigma_u
+
+y_m = y_KF - C_KF.dot(mu_p)
+sigma_m = C_KF.dot(sigma_p.dot(C_KF.transpose())) + sigma_n
+kkf_gain = sigma_p.dot(C_KF.transpose().dot(np.linalg.inv(sigma_m)))
+
+mu = mu_p + kkf_gain.dot(y_m)
+sigma = (np.eye(4) - kkf_gain.dot(C_KF)).dot(sigma_p)
+
+<span style="font-weight: bold">return</span> mu, sigma
+</pre>
+        </div>
+
+        <p>Here is the result of this change in the rate of measurement. The system takes a little bit longer to
+          stabilize and stays off screen for a bit longer than before, but still works! The major pro here is that the
+          system matrix is now observable since it has a rank of 4.</p>
+
+        <iframe style="display:block;margin: 0 auto;" width="560" height="315"
+          src="https://www.youtube.com/embed/_ILtlRIsxQQ" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        <br>
+        <img src="images/lab12/z_thetadot.png" style="display:block;margin: 0 auto;">
+        <br>
+        <img src="images/lab12/z_thetadot_observable.png" style="display:block;margin: 0 auto;">
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="ftco-footer ftco-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+
+          <p>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;
+            <script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with
+            <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com"
+              target="_blank">Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
+      <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+      <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
+        stroke="#F96D00" />
+    </svg></div>
+
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/scrollax.min.js"></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="js/google-map.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
